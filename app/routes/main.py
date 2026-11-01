@@ -43,7 +43,7 @@ def search():
             (f"%{query}%", f"%{query}%")
         ).fetchall()
         
-    is_vuln = is_lab_vulnerable('reflected_xss')
+    is_vuln = is_lab_vulnerable('xss')
     
     # Xử lý phản chiếu XSS theo trạng thái lab
     if is_vuln:

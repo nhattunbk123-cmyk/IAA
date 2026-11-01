@@ -244,41 +244,21 @@ def seed_data(db):
         VALUES (?, ?, ?, ?, ?);
     """, order_items_data)
 
-    # 6. Seed Lab Settings (9 bài lab với trạng thái mặc định is_vulnerable = 1)
+    # 6. Seed Lab Settings (Chỉ giữ lại 3 bài lab cốt lõi: XSS, SQL Injection, Command Injection)
     labs_data = [
         (
-            'reflected_xss',
-            'Reflected XSS (Cross-Site Scripting phản chiếu)',
-            'Web Security',
-            'Dễ',
-            1,
-            'Tham số tìm kiếm trên URL được phản chiếu trực tiếp vào HTML mà không qua mã hóa thực thể HTML.',
-            '/search',
-            'GET'
-        ),
-        (
-            'stored_xss',
-            'Stored XSS (Cross-Site Scripting lưu trữ)',
-            'Web Security',
+            'xss',
+            'Cross-Site Scripting (XSS - Reflected & Stored)',
+            'Web Application Security',
             'Trung bình',
             1,
-            'Bình luận sản phẩm được lưu thô vào cơ sở dữ liệu và hiển thị trực tiếp cho mọi người xem với bộ lọc tắt escape.',
-            '/products/<id>/comments',
-            'POST'
-        ),
-        (
-            'dom_xss',
-            'DOM-based XSS (XSS trên DOM phía trình duyệt)',
-            'Client Security',
-            'Trung bình',
-            1,
-            'Mã JavaScript client đọc dữ liệu từ URL hash hoặc query string rồi chèn trực tiếp vào innerHTML.',
-            '/product/<id>#promo=...',
-            'GET'
+            'Lỗ hổng chèn mã script độc hại qua ô tìm kiếm (Reflected XSS) và bình luận sản phẩm (Stored XSS) khi không được mã hóa thực thể HTML.',
+            '/search và /product/<id>/comment',
+            'GET / POST'
         ),
         (
             'sqli',
-            'SQL Injection (Tiêm mã SQL qua tìm kiếm/lọc)',
+            'SQL Injection (Tiêm mã truy vấn CSDL)',
             'Database Security',
             'Dễ',
             1,
@@ -287,83 +267,13 @@ def seed_data(db):
             'GET'
         ),
         (
-            'idor',
-            'Insecure Direct Object References (IDOR)',
-            'Access Control',
-            'Dễ',
-            1,
-            'Endpoint xem chi tiết đơn hàng chỉ dựa trên ID truyền vào từ URL/API mà không kiểm tra quyền sở hữu của người dùng hiện tại.',
-            '/orders/<id>',
-            'GET'
-        ),
-        (
-            'broken_access_control',
-            'Broken Access Control (Leo thang đặc quyền API)',
-            'Access Control',
-            'Trung bình',
-            1,
-            'API quản trị cho phép thay đổi trạng thái đơn hàng hoặc vai trò người dùng nhưng chỉ kiểm tra đăng nhập mà quên kiểm tra quyền admin.',
-            '/api/admin/orders/<id>/status',
-            'POST'
-        ),
-        (
-            'csrf',
-            'Cross-Site Request Forgery (CSRF)',
-            'Session Security',
-            'Trung bình',
-            1,
-            'Chức năng cập nhật địa chỉ giao hàng không có token bảo vệ CSRF, chấp nhận request gửi kèm cookie phiên hợp lệ từ nguồn thứ ba.',
-            '/profile/update-address',
-            'POST'
-        ),
-        (
-            'business_logic',
-            'Business Logic Flaw (Thao túng giá sản phẩm)',
-            'Business Logic',
-            'Dễ',
-            1,
-            'Endpoint thanh toán đơn hàng tin tưởng hoàn toàn vào giá sản phẩm do phía client gửi lên thay vì truy xuất giá từ database.',
-            '/cart/checkout',
-            'POST'
-        ),
-        (
-            'security_misconfig',
-            'Security Misconfiguration (Lộ thông tin gỡ lỗi)',
-            'Server Security',
-            'Dễ',
-            1,
-            'Endpoint debug để lộ biến môi trường giả lập, thông tin phiên bản nội bộ và thông báo lỗi chi tiết khi gặp sự cố.',
-            '/api/system/debug-info',
-            'GET'
-        ),
-        (
             'command_injection',
             'OS Command Injection (Tiêm lệnh hệ điều hành)',
-            'Command Injection',
+            'System Security',
             'Trung bình',
             1,
             'Công cụ kiểm tra mạng nối trực tiếp tham số người dùng vào lệnh shell hệ thống (ping) mà không qua làm sạch hay danh sách đối số an toàn.',
             '/tools/ping',
-            'POST'
-        ),
-        (
-            'file_upload_shell',
-            'Insecure File Upload & Web Shell (Lỗ hổng ngôn ngữ cốt lõi - PHP2Shell)',
-            'Core Language & RCE',
-            'Khó',
-            1,
-            'Cho phép tải lên tệp mã nguồn độc hại (.php, .py, .sh) và thực thi Web Shell trực tiếp trên máy chủ do thiếu cơ chế kiểm tra đuôi mở rộng và phân quyền thư mục.',
-            '/tools/upload-file',
-            'POST'
-        ),
-        (
-            'dos_redos',
-            'Denial of Service (DoS - ReDoS qua biểu thức chính quy)',
-            'Denial of Service',
-            'Trung bình',
-            1,
-            'Kiểm tra mã giảm giá sử dụng biểu thức chính quy lồng lặp dễ bị Catastrophic Backtracking, gây treo CPU và từ chối dịch vụ toàn bộ hệ thống.',
-            '/tools/validate-coupon',
             'POST'
         )
     ]
@@ -398,7 +308,16 @@ def seed_data(db):
     db.commit()
 
 def is_lab_vulnerable(lab_id):
-    """Kiểm tra xem một bài lab cụ thể đang ở chế độ Vulnerable (1) hay Fixed (0)."""
+    """
+    Kiểm tra xem một bài lab cụ thể đang ở chế độ Vulnerable (1) hay Fixed (0).
+    Chỉ duy trì 3 bài lab cốt lõi: 'xss', 'sqli', 'command_injection'.
+    Các định danh XSS phụ (reflected_xss, stored_xss, dom_xss) tự động ánh xạ về 'xss'.
+    Mọi tính năng/lab khác mặc định là False (đã vá an toàn vĩnh viễn).
+    """
+    if lab_id in ('reflected_xss', 'stored_xss', 'dom_xss'):
+        lab_id = 'xss'
+    if lab_id not in ('xss', 'sqli', 'command_injection'):
+        return False
     try:
         db = get_db()
         row = db.execute("SELECT is_vulnerable FROM lab_settings WHERE lab_id = ?", (lab_id,)).fetchone()
@@ -410,6 +329,8 @@ def is_lab_vulnerable(lab_id):
 
 def set_lab_vulnerable(lab_id, status: bool):
     """Bật/tắt chế độ vulnerable cho một bài lab."""
+    if lab_id in ('reflected_xss', 'stored_xss', 'dom_xss'):
+        lab_id = 'xss'
     db = get_db()
     db.execute("UPDATE lab_settings SET is_vulnerable = ? WHERE lab_id = ?", (1 if status else 0, lab_id))
     db.commit()

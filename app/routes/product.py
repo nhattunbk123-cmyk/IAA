@@ -21,8 +21,8 @@ def detail(product_id):
         (product_id,)
     ).fetchall()
     
-    is_stored_xss_vuln = is_lab_vulnerable('stored_xss')
-    is_dom_xss_vuln = is_lab_vulnerable('dom_xss')
+    is_stored_xss_vuln = is_lab_vulnerable('xss')
+    is_dom_xss_vuln = is_lab_vulnerable('xss')
 
     return render_template(
         'product_detail.html',

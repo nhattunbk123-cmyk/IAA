@@ -9,37 +9,6 @@
             <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">📑 Toàn Bộ Đơn Hàng Hệ Thống</h1>
             <p style="color: var(--text-muted); font-size: 0.95rem;">Quản trị trạng thái và theo dõi đơn hàng của toàn bộ khách hàng</p>
         </div>
-
-        <div>
-            <a href="{{ url_for('lab.detail', lab_id='broken_access_control') }}" class="btn btn-secondary btn-sm">
-                🔬 Xem tài liệu Broken Access Control →
-            </a>
-        </div>
-    </div>
-
-    <!-- KHUNG THỬ NGHIỆM LAB: BROKEN ACCESS CONTROL API -->
-    <div style="background: rgba(31, 41, 55, 0.7); border: 1px dashed var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
-        <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-            🔬 Kiểm Thử API Phân Quyền Quản Trị (Broken Access Control):
-        </h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
-            Endpoint: <code>POST /api/admin/orders/&lt;order_id&gt;/status</code>.<br>
-            - Ở chế độ <strong>Vulnerable</strong>: Bất kỳ ai đăng nhập (kể cả khách hàng bình thường như <code>user1</code>) đều có thể gửi request để đổi trạng thái đơn hàng bất kỳ sang "Đã hoàn thành".<br>
-            - Ở chế độ <strong>Fixed</strong>: Server kiểm tra thuộc tính vai trò <code>session['role'] == 'admin'</code>, từ chối người dùng thường với mã <code>403 Forbidden</code>.
-        </p>
-
-        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-            <input type="number" id="bac-order-id" value="1" min="1" class="form-control" style="width: 120px;" placeholder="Order ID">
-            <select id="bac-new-status" class="form-control" style="width: 180px;">
-                <option value="Đã hoàn thành">Đã hoàn thành</option>
-                <option value="Đang giao hàng">Đang giao hàng</option>
-                <option value="Đã hủy">Đã hủy</option>
-            </select>
-            <button type="button" id="btn-test-bac" class="btn btn-primary btn-sm">
-                ⚡ Gửi Request Thử Nghiệm API
-            </button>
-        </div>
-        <div id="bac-result-box" style="display: none; margin-top: 1rem; padding: 0.75rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.85rem;"></div>
     </div>
 
     <!-- Bảng danh sách đơn hàng -->

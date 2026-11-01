@@ -35,24 +35,15 @@
 
 ---
 
-## 2. DANH SÁCH 12 BÀI LAB BẢO MẬT
+## 2. DANH SÁCH 3 BÀI LAB BẢO MẬT CỐT LÕI
 
 | STT | Bài Lab | Danh Mục | Độ Khó | Endpoint Liên Quan | Phương Thức |
 |:---:|:---|:---|:---:|:---|:---:|
-| **1** | **Reflected XSS** | Web Security | Dễ | `/search?q=...` | `GET` |
-| **2** | **Stored XSS** | Web Security | Trung bình | `/product/<id>/comment` | `POST` |
-| **3** | **DOM-based XSS** | Client Security | Trung bình | `/product/<id>#promo=...` | `GET` |
-| **4** | **SQL Injection** | Database Security | Dễ | `/products/filter` | `GET` |
-| **5** | **IDOR** | Access Control | Dễ | `/orders/<id>` & `/api/orders/<id>` | `GET` |
-| **6** | **Broken Access Control** | Access Control | Trung bình | `/api/admin/orders/<id>/status` | `POST` |
-| **7** | **CSRF** | Session Security | Trung bình | `/profile/update-address` | `POST` |
-| **8** | **Business Logic Flaw** | Business Logic | Dễ | `/cart/checkout` | `POST` |
-| **9** | **Security Misconfiguration** | Server Security | Dễ | `/api/system/debug-info` | `GET` |
-| **10** | **OS Command Injection** | Command Injection | Trung bình | `/tools/ping` | `POST` |
-| **11** | **Insecure File Upload & WebShell** | Core Language & RCE | Khó | `/tools/upload-file` | `POST` |
-| **12** | **Denial of Service (ReDoS)** | Denial of Service | Trung bình | `/tools/validate-coupon` | `POST` |
+| **1** | **Cross-Site Scripting (XSS)** | Web Application Security | Trung bình | `/search?q=...` & `/product/<id>/comment` | `GET` / `POST` |
+| **2** | **SQL Injection (SQLi)** | Database Security | Dễ | `/products/filter` | `GET` |
+| **3** | **OS Command Injection** | System Security | Trung bình | `/tools/ping` | `POST` |
 
-> 📖 *Xem hướng dẫn chi tiết từng bài lab, cơ chế khai thác và phòng thủ tại tệp:* [`docs/SECURITY_LABS.md`](docs/SECURITY_LABS.md)
+> 📖 *Các tính năng khác (IDOR, CSRF, Phân quyền API, Upload file...) đã được mặc định vá an toàn 100%.*
 
 ---
 
