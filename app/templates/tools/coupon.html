@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Denial of Service (ReDoS) Lab - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0; max-width: 900px; margin-left: auto; margin-right: auto;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">Lab 12: Denial of Service (ReDoS)</span>
+                <span class="badge {{ 'status-badge-vuln' if is_vuln else 'status-badge-fixed' }}" id="status-badge-dos_redos">
+                    {{ '🔴 Vulnerable' if is_vuln else '🟢 Fixed' }}
+                </span>
+            </div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">⚡ Xác Thực Mã Giảm Giá & Kiểm Thử ReDoS</h1>
+        </div>
+        <div>
+            <div class="switch-container">
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Trạng thái Lab:</span>
+                <label class="switch">
+                    <input type="checkbox" class="lab-toggle-checkbox" data-lab-id="dos_redos" {{ 'checked' if is_vuln else '' }}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+            <span>⚠️ {{ error }}</span>
+        </div>
+    {% endif %}
+
+    <!-- Card Form Kiểm Tra Voucher -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: #fff;">Kiểm tra tính hợp lệ của mã Coupon / Voucher</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Hệ thống sử dụng biểu thức chính quy (Regular Expression) để kiểm tra cú pháp mã giảm giá trước khi áp dụng chiết khấu.
+        </p>
+
+        <form method="POST" action="{{ url_for('tools.validate_coupon') }}">
+            <div class="form-group">
+                <label for="coupon_code" style="font-weight: 600;">Mã giảm giá (Coupon Code):</label>
+                <div style="display: flex; gap: 0.75rem; margin-top: 0.35rem;">
+                    <input 
+                        type="text" 
+                        id="coupon_code" 
+                        name="coupon_code" 
+                        class="form-control" 
+                        placeholder="Ví dụ: SUMMER2026 hoặc TET2026" 
+                        value="{{ coupon_code }}"
+                        required
+                        style="flex: 1;"
+                    >
+                    <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
+                        🔍 Kiểm Tra Mã
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Quick Payload Buttons -->
+        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+            <span style="font-size: 0.85rem; color: var(--text-dim); display: block; margin-bottom: 0.5rem;">
+                🎯 Payload mẫu để quan sát hiện tượng Treo CPU (ReDoS):
+            </span>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setCoupon('SUMMER2026')">
+                    Mã bình thường: SUMMER2026 (~0.05ms)
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setCoupon('INVALID123!')">
+                    Mã sai ngắn: INVALID123! (~0.05ms)
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="setCoupon('aaaaaaaaaaaaaaaa!')">
+                    🔴 ReDoS Test 1: aaaaaaaaaaaaaaaa! (~1.700ms)
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="setCoupon('aaaaaaaaaaaaaaaaaa!')">
+                    🔴 ReDoS Test 2: aaaaaaaaaaaaaaaaaa! (~6.800ms)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kết quả & Đo lường thời gian (Performance Monitor) -->
+    {% if result %}
+        <div class="card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h4 style="font-size: 1.1rem; color: #fff;">📊 Kết Quả Phân Tích Cú Pháp</h4>
+                
+                <!-- Huy hiệu đo thời gian thực thi (Execution Timer) -->
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Thời gian phân tích Regex:</span>
+                    <span class="badge" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; padding: 0.4rem 0.8rem; background: {{ 'rgba(239, 68, 68, 0.25)' if execution_time_ms > 500 else 'rgba(16, 185, 129, 0.2)' }}; color: {{ '#f87171' if execution_time_ms > 500 else '#34d399' }}; border: 1px solid {{ '#f87171' if execution_time_ms > 500 else '#34d399' }};">
+                        ⏱️ {{ execution_time_ms }} ms
+                    </span>
+                </div>
+            </div>
+
+            {% if result.valid %}
+                <div class="alert alert-success">
+                    <span>🎉 {{ result.message }} (Ưu đãi: <strong>{{ result.discount }}</strong>)</span>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">
+                    <span>⚠️ {{ result.message }}</span>
+                </div>
+            {% endif %}
+
+            {% if execution_time_ms > 500 %}
+                <div style="margin-top: 1rem; padding: 0.85rem; background: rgba(239, 68, 68, 0.12); border-left: 4px solid #ef4444; border-radius: 4px;">
+                    <strong style="color: #f87171;">🔥 PHÁT HIỆN TẤN CÔNG RE-DOS THÀNH CÔNG!</strong>
+                    <p style="margin: 0.35rem 0 0 0; font-size: 0.9rem; color: #fca5a5; line-height: 1.6;">
+                        Thời gian phản hồi đã tăng vọt lên <strong>{{ execution_time_ms }} mili-giây</strong> (gấp hàng chục nghìn lần bình thường). 
+                        CPU máy chủ bị chiếm dụng bởi thuật toán quay lui (Catastrophic Backtracking) trước khi trả về kết quả!
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Hướng dẫn chi tiết -->
+    <div class="accordion">
+        <div class="accordion-item">
+            <button class="accordion-trigger">
+                <span>🎯 Nguyên lý Catastrophic Backtracking trong ReDoS</span>
+                <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-content">
+                <p><strong>ReDoS (Regular Expression Denial of Service):</strong> Xảy ra khi một biểu thức chính quy chứa các nhóm lặp lồng nhau như <code>^(([a-zA-Z0-9]+)+)+$</code>.</p>
+                <ul style="padding-left: 1.25rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    <li>Khi chuỗi không khớp nằm ở ký tự cuối cùng (<code>!</code>), bộ phân tích NFA phải thử nghiệm toàn bộ $2^n$ hoán vị có thể của các nhóm con trước khi kết luận chuỗi không hợp lệ.</li>
+                    <li><strong>Vulnerable:</strong> Không giới hạn độ dài chuỗi và dùng mẫu regex lồng lặp, khiến request mất từ 2 đến hàng chục giây.</li>
+                    <li><strong>Fixed:</strong> Giới hạn độ dài tối đa trước và sử dụng Regex tuyến tính an toàn <code>^[a-zA-Z0-9]{4,16}$</code> (độ phức tạp $O(N)$, xử lý dưới 0.1ms).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setCoupon(val) {
+    document.getElementById('coupon_code').value = val;
+}
+</script>
+{% endblock %}

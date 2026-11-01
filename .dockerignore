@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+instance/*.db-journal
+.git/
+.gitignore
+tests/test_lab.db

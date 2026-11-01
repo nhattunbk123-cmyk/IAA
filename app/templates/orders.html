@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Lịch Sử Đơn Hàng Của Bạn - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 700;">📦 Đơn Hàng Của Bạn</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Danh sách toàn bộ các đơn hàng đã được khởi tạo trong phiên làm việc.</p>
+        </div>
+        <a href="{{ url_for('lab.detail', lab_id='idor') }}" class="btn btn-secondary btn-sm">Xem hướng dẫn IDOR Lab →</a>
+    </div>
+
+    {% if orders %}
+        <div class="table-responsive" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Ngày tạo</th>
+                        <th>Địa chỉ nhận</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>
+                                <strong style="color: #93c5fd;">{{ order.order_code }}</strong>
+                                <span style="font-size: 0.75rem; color: var(--text-dim); display: block;">ID: {{ order.id }}</span>
+                            </td>
+                            <td style="font-size: 0.85rem; color: var(--text-muted);">{{ order.created_at }}</td>
+                            <td style="font-size: 0.9rem; max-width: 250px;">{{ order.shipping_address }}</td>
+                            <td style="color: #34d399; font-weight: 700;">{{ "{:,.0f}".format(order.total_amount) }} đ</td>
+                            <td>
+                                <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid #3b82f6;">
+                                    {{ order.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('cart.order_detail', order_id=order.id) }}" class="btn btn-primary btn-sm">
+                                    Chi tiết →
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 1rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+            <h3>Bạn chưa có đơn hàng nào.</h3>
+            <p style="color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 1.5rem;">Hãy thêm sản phẩm vào giỏ hàng và tiến hành đặt hàng để tạo dữ liệu kiểm thử.</p>
+            <a href="{{ url_for('main.product_list') }}" class="btn btn-primary">Khám phá sản phẩm</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

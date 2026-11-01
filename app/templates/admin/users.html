@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Quản Lý Người Dùng - VulnShop Admin{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">👥 Quản Lý Người Dùng & Vai Trò</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Danh sách tài khoản hệ thống phục vụ kịch bản kiểm thử bảo mật</p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="{{ url_for('admin.access_logs') }}" class="btn btn-secondary btn-sm" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; border-color: rgba(14, 165, 233, 0.4);">
+                🕒 Lịch sử truy cập web
+            </a>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm">
+                ⚡ Về Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">ID</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Họ và tên</th>
+                    <th>Email</th>
+                    <th>Địa chỉ</th>
+                    <th>Vai trò (Role)</th>
+                    <th>Ngày đăng ký</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    <tr>
+                        <td style="color: var(--text-dim);">#{{ u.id }}</td>
+                        <td>
+                            <strong style="color: #93c5fd;">@{{ u.username }}</strong>
+                        </td>
+                        <td style="color: #fff; font-weight: 600;">{{ u.full_name }}</td>
+                        <td style="font-size: 0.85rem; color: var(--text-muted);">{{ u.email }}</td>
+                        <td style="font-size: 0.85rem; max-width: 250px;">{{ u.address }}</td>
+                        <td>
+                            {% if u.role == 'admin' %}
+                                <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b;">
+                                    👑 admin
+                                </span>
+                            {% else %}
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981;">
+                                    👤 user
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size: 0.8rem; color: var(--text-dim);">{{ u.created_at }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

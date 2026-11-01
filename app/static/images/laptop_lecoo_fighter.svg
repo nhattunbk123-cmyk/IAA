@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 250" width="100%" height="100%">
+  <!-- Laptop Lecoo Fighter 7000P 2026 -->
+  <defs>
+    <radialGradient id="fighterGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Laptop Display Lid -->
+  <g transform="translate(30, 20)">
+    <!-- Outer Bezel -->
+    <rect x="0" y="0" width="260" height="165" rx="6" fill="#181a20" stroke="#333846" stroke-width="2"/>
+    <!-- Webcam -->
+    <circle cx="130" cy="5" r="2" fill="#475569"/>
+    <!-- Inner Screen -->
+    <rect x="8" y="9" width="244" height="147" rx="3" fill="#06090e"/>
+    
+    <!-- Screen Content: White Glowing Wings Logo -->
+    <rect x="8" y="9" width="244" height="147" fill="#080c14"/>
+    <!-- Winged Emblem (Matching Image 1) -->
+    <path d="M100 45 L125 105 L115 110 L95 65 Z" fill="#ffffff" opacity="0.95"/>
+    <path d="M85 60 L110 115 L100 120 L78 78 Z" fill="#e2e8f0" opacity="0.8"/>
+    <path d="M160 45 L135 105 L145 110 L165 65 Z" fill="#ffffff" opacity="0.95"/>
+    <path d="M175 60 L150 115 L160 120 L182 78 Z" fill="#e2e8f0" opacity="0.8"/>
+    <polygon points="127,112 133,112 130,130" fill="#38bdf8"/>
+    <text x="130" y="145" font-family="'Segoe UI', Roboto, sans-serif" font-size="8" font-weight="800" fill="#cbd5e1" text-anchor="middle" letter-spacing="1">FIGHTER 7000P</text>
+
+    <!-- Hinge -->
+    <rect x="80" y="165" width="100" height="6" fill="#2d323f"/>
+  </g>
+
+  <!-- Laptop Base (Keyboard Deck) -->
+  <polygon points="10,190 310,190 320,225 0,225" fill="#1b1e26" stroke="#2c3240" stroke-width="1.5"/>
+  <!-- Keyboard area -->
+  <polygon points="35,193 285,193 292,213 28,213" fill="#0f1117" stroke="#38bdf8" stroke-width="0.8" stroke-opacity="0.6"/>
+  <!-- Trackpad -->
+  <rect x="125" y="216" width="70" height="7" rx="1.5" fill="#141720" stroke="#333846" stroke-width="0.8"/>
+</svg>

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Hồ Sơ Cá Nhân & Tài Khoản - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2.5rem 0;">
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff;">👤 Hồ Sơ Khách Hàng</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Quản lý thông tin tài khoản, ảnh đại diện và sổ địa chỉ giao hàng.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1.25fr; gap: 2rem; margin-bottom: 2.5rem;">
+        <!-- Thẻ thông tin tài khoản & Avatar -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem;">
+            <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+                <div style="width: 72px; height: 72px; border-radius: 50%; background: #1e293b; border: 2px solid #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 2rem; overflow: hidden;">
+                    {% if session.get('avatar_url') %}
+                        <img src="{{ session.get('avatar_url') }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        👤
+                    {% endif %}
+                </div>
+                <div>
+                    <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.25rem;">{{ user.full_name }}</h2>
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981;">
+                        Thành viên: {{ user.role }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Form Cập nhật Avatar (Insecure File Upload) -->
+            <div style="margin-bottom: 1.5rem; background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">📷 Cập Nhật Ảnh Đại Diện</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+                    Tải lên hình ảnh cá nhân (.png, .jpg) để hiển thị trong phần đánh giá sản phẩm.
+                </p>
+                <form action="{{ url_for('auth.upload_avatar') }}" method="POST" enctype="multipart/form-data">
+                    <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                        <input type="file" name="avatar" class="form-control" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;" required>
+                        <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 0.25rem;">
+                            📤 Tải Lên Ảnh Đại Diện
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.95rem;">
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Tên đăng nhập:</span>
+                    <p style="font-weight: 600; color: #93c5fd;">{{ user.username }}</p>
+                </div>
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;">Địa chỉ Email:</span>
+                    <p style="color: var(--text-muted);">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <!-- Quản lý Bảo Mật 2 Lớp (Google Authenticator) -->
+            <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.88rem; font-weight: 700; color: #fff;">🔐 Google Authenticator (2FA)</span>
+                    {% if user.two_factor_enabled %}
+                        <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; font-size: 0.75rem;">
+                            🟢 Đã kích hoạt
+                        </span>
+                    {% else %}
+                        <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; font-size: 0.75rem;">
+                            ⚪ Chưa kích hoạt
+                        </span>
+                    {% endif %}
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4;">
+                    Bảo vệ tài khoản an toàn tuyệt đối với mã OTP 6 số đổi mới mỗi 30 giây trên điện thoại.
+                </p>
+                {% if user.two_factor_enabled %}
+                    <form action="{{ url_for('auth.disable_2fa') }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn tắt bảo mật 2 lớp Google Authenticator?');">
+                        <button type="submit" class="btn btn-secondary btn-sm" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); font-size: 0.8rem;">
+                            ❌ Tắt Bảo Mật 2 Lớp
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('auth.setup_2fa') }}" class="btn btn-primary btn-sm" style="font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        📱 Kích Hoạt Ngay
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Form đổi địa chỉ giao hàng (Mục tiêu của CSRF) -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem;">
+            <h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+                Địa Chỉ Giao Hàng Mặc Định
+            </h2>
+
+            <form action="{{ url_for('auth.update_address') }}" method="POST">
+                {% if not is_csrf_vuln %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600;">Địa chỉ nhận hàng hiện tại:</label>
+                    <textarea name="address" rows="3" class="form-control" placeholder="Nhập địa chỉ nhận hàng chi tiết..." required>{{ user.address }}</textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary">💾 Lưu Địa Chỉ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lịch sử đơn hàng gần đây -->
+    <div class="card">
+        <h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">
+            📦 Lịch Sử Mua Hàng Gần Đây
+        </h2>
+        {% if orders %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Ngày đặt</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td><code style="color: #60a5fa;">#{{ order.id }} - {{ order.order_code }}</code></td>
+                                <td style="color: var(--text-muted);">{{ order.created_at }}</td>
+                                <td style="color: #34d399; font-weight: 700;">{{ "{:,.0f}".format(order.total_amount) }} đ</td>
+                                <td>
+                                    <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('cart.order_detail', order_id=order.id) }}" class="btn btn-secondary btn-sm">
+                                        Xem chi tiết →
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Bạn chưa có đơn hàng nào.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

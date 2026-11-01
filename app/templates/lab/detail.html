@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lab.name }} - Tài Liệu Lab Bảo Mật{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0; max-width: 950px; margin-left: auto; margin-right: auto;">
+    <!-- Nút quay lại -->
+    <div style="margin-bottom: 1.5rem;">
+        <a href="{{ url_for('lab.index') }}" style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted);">
+            ← Quay lại Bảng điều khiển Lab
+        </a>
+    </div>
+
+    <!-- Header bài lab -->
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span class="badge" style="background: rgba(255, 255, 255, 0.08); color: #93c5fd;">
+                        {{ lab.category }}
+                    </span>
+                    <span class="badge {{ 'badge-easy' if lab.difficulty == 'Dễ' else 'badge-medium' }}">
+                        Độ khó: {{ lab.difficulty }}
+                    </span>
+                    <span class="badge {{ 'status-badge-vuln' if lab.is_vulnerable else 'status-badge-fixed' }}" id="status-badge-{{ lab.id }}">
+                        {{ '🔴 Vulnerable' if lab.is_vulnerable else '🟢 Fixed' }}
+                    </span>
+                </div>
+                <h1 style="font-size: 2rem; font-weight: 800; color: #fff;">{{ lab.name }}</h1>
+            </div>
+
+            <!-- Switch chuyển đổi trạng thái -->
+            <div class="switch-container">
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">Chuyển đổi:</span>
+                <label class="switch">
+                    <input type="checkbox" class="lab-toggle-checkbox" data-lab-id="{{ lab.id }}" {{ 'checked' if lab.is_vulnerable else '' }}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.9rem; display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <div><span style="color: var(--text-dim);">Endpoint:</span> <code style="color: #60a5fa;">{{ lab.endpoint }}</code></div>
+            <div><span style="color: var(--text-dim);">Phương thức HTTP:</span> <span class="badge" style="background: rgba(255,255,255,0.06);">{{ lab.method }}</span></div>
+        </div>
+    </div>
+
+    <!-- Mục tiêu & Nguyên nhân -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                🎯 Mục Tiêu Bài Lab
+            </h2>
+            <p style="color: var(--text-muted); line-height: 1.7;">{{ lab.objective }}</p>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                🔍 Nguyên Nhân Gốc Trong Mã Nguồn (Root Cause)
+            </h2>
+            <p style="color: var(--text-muted); line-height: 1.7;">{{ lab.root_cause }}</p>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                💥 Tác Động & Hậu Quả Bảo Mật (Impact)
+            </h2>
+            <p style="color: var(--text-muted); line-height: 1.7;">{{ lab.impact }}</p>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                🛡️ Biện Pháp Phòng Thủ & Khắc Phục (Remediation)
+            </h2>
+            <div style="color: var(--text-muted); line-height: 1.7; white-space: pre-line;">{{ lab.remediation }}</div>
+        </div>
+    </div>
+
+    <!-- So sánh Code Diff Trực Quan -->
+    <div style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            ⚖️ So Sánh Mã Nguồn: Trước vs Sau Khi Khắc Phục (Code Diff)
+        </h2>
+
+        <div class="code-diff-container">
+            <!-- Khối Mã Lỗi -->
+            <div class="code-box vuln">
+                <div class="code-box-header">
+                    <span style="color: #f87171;">🔴 Mã nguồn chứa lỗ hổng (Vulnerable)</span>
+                    <span>CẦN TRÁNH</span>
+                </div>
+                <pre><code>{{ lab.vulnerable_code }}</code></pre>
+            </div>
+
+            <!-- Khối Mã Đã Sửa -->
+            <div class="code-box fixed">
+                <div class="code-box-header">
+                    <span style="color: #34d399;">🟢 Mã nguồn chuẩn bảo mật (Fixed)</span>
+                    <span>KHUYẾN NGHỊ</span>
+                </div>
+                <pre><code>{{ lab.fixed_code }}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hướng dẫn kiểm chứng & gợi ý -->
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2.5rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">
+            🧪 Các Bước Kiểm Chứng & Gợi Ý Phân Tích
+        </h3>
+
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>💡 Gợi ý phân tích (Click để mở)</span>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <ul style="margin-left: 1.5rem; line-height: 1.7;">
+                        {% for hint in lab.hints %}
+                            <li>{{ hint }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span>📖 Hướng dẫn kiểm chứng cơ chế</span>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <p style="line-height: 1.7;">{{ lab.solution_overview }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

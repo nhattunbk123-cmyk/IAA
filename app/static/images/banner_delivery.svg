@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="deliveryBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="450" height="160" rx="8" fill="url(#deliveryBg)" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- Top Logo tag -->
+  <g transform="translate(195, 16)">
+    <circle cx="10" cy="10" r="10" fill="#fff" stroke="#e11b22" stroke-width="1.5"/>
+    <text x="10" y="14" font-family="'Segoe UI', Roboto, sans-serif" font-size="7.5" font-weight="900" fill="#e11b22" text-anchor="middle">52H</text>
+    <text x="25" y="14" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#1e293b">Laptop52h.vn</text>
+  </g>
+
+  <!-- Title: GIAO HÀNG TOÀN QUỐC -->
+  <rect x="180" y="36" width="105" height="18" rx="3" fill="#ffedd5"/>
+  <text x="232" y="49" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="800" fill="#c2410c" text-anchor="middle">MUA HÀNG ONLINE</text>
+
+  <text x="300" y="76" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="900" fill="#1e40af" letter-spacing="-0.5" text-anchor="middle">GIAO HÀNG</text>
+  <text x="300" y="100" font-family="'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="900" fill="#dc2626" letter-spacing="-0.5" text-anchor="middle">TOÀN QUỐC</text>
+
+  <!-- Subtitle -->
+  <text x="300" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b" text-anchor="middle">✓ Miễn phí vận chuyển  ✓ Giao tận nơi</text>
+
+  <!-- Hotline badge -->
+  <rect x="200" y="126" width="200" height="24" rx="12" fill="#e11b22"/>
+  <text x="235" y="142" font-family="'Segoe UI', Roboto, sans-serif" font-size="8" font-weight="700" fill="#fef2f2">HOTLINE:</text>
+  <text x="315" y="143" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="900" fill="#ffffff">0825 233 233</text>
+
+  <!-- Left: Stylized Gaming Laptop Mockup -->
+  <g transform="translate(15, 25) scale(0.48)">
+    <rect x="0" y="0" width="300" height="190" rx="6" fill="#0f172a" stroke="#334155" stroke-width="3"/>
+    <rect x="12" y="10" width="276" height="170" rx="4" fill="#020617"/>
+    <path d="M50 150 L150 40 L250 150 Z" fill="none" stroke="#e11b22" stroke-width="4"/>
+    <circle cx="150" cy="95" r="30" fill="#1e3a8a" opacity="0.6"/>
+    <text x="150" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#38bdf8" text-anchor="middle">ROG STRIX</text>
+    <polygon points="-25,190 325,190 345,240 -45,240" fill="#1e293b"/>
+    <line x1="-15" y1="210" x2="315" y2="210" stroke="#00ffff" stroke-width="3"/>
+  </g>
+</svg>

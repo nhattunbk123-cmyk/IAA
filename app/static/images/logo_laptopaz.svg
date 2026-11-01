@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none">
+  <!-- Circular AZ Icon -->
+  <circle cx="32" cy="32" r="28" fill="#ffffff" stroke="#e11b22" stroke-width="2.5"/>
+  <circle cx="32" cy="32" r="23" fill="#ffffff"/>
+  <path d="M19 41L29 19H35L45 41H38.5L36.3 35.8H27.7L25.5 41H19ZM29.5 31.2H34.5L32 24.8L29.5 31.2Z" fill="#1967d2"/>
+  <path d="M33 39H45V43H30L39.5 28.5V25H33V21H45V24.5L33 39Z" fill="#e11b22" opacity="0.95"/>
+  
+  <!-- Text LaptopAZ.vn -->
+  <text x="68" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="900" fill="#1a202c" letter-spacing="-0.5">Laptop<tspan fill="#e11b22">AZ</tspan><tspan fill="#1967d2" font-size="19" font-weight="700">.vn</tspan></text>
+  <text x="70" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="600" fill="#64748b" letter-spacing="1.5">CHUYÊN GIA LAPTOP GAMING</text>
+</svg>

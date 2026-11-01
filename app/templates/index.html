@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}Laptop52h.vn - Chuyên Gia Laptop Gaming & Thiết Bị Công Nghệ{% endblock %}
+
+{% block content %}
+<!-- 1. BREADCRUMBS -->
+<div class="breadcrumb-bar">
+    <a href="{{ url_for('main.index') }}">Trang chủ</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">LAPTOP GAMING</span>
+</div>
+
+<!-- 2. HERO BANNER SECTION (NITRO V 15 + GIAO HÀNG TOÀN QUỐC + 10 LÝ DO) -->
+<section class="hero-layout">
+    <!-- Banner lớn Acer Nitro V 15 ANV15-51 -->
+    <div class="hero-main-banner" style="position: relative;">
+        <a href="{{ url_for('product.detail', product_id=5) }}" title="Xem chi tiết Acer Nitro V 15 ANV15-51">
+            <img src="{{ banner_main }}" alt="Acer Nitro V 15 ANV15-51 Banner" id="img-banner-main">
+        </a>
+        {% if current_user.role == 'admin' %}
+            <button type="button" class="btn-admin-banner-edit" onclick="openBannerEditModal('banner_main', 'Banner chính (Nitro V 15)', '{{ banner_main }}')" title="Đổi ảnh banner chính">
+                🖼️ Đổi Banner
+            </button>
+        {% endif %}
+    </div>
+
+    <!-- Cột banner phụ bên phải -->
+    <div class="hero-side-column">
+        <!-- Banner Giao Hàng Toàn Quốc -->
+        <div class="hero-side-banner" style="position: relative;">
+            <a href="tel:0825233233" title="Hotline tư vấn giao hàng toàn quốc">
+                <img src="{{ banner_side }}" alt="Giao Hàng Toàn Quốc Hotline 0825 233 233" id="img-banner-side">
+            </a>
+            {% if current_user.role == 'admin' %}
+                <button type="button" class="btn-admin-banner-edit" onclick="openBannerEditModal('banner_side', 'Banner phụ (Giao hàng)', '{{ banner_side }}')" title="Đổi ảnh banner phụ">
+                    🖼️ Đổi Banner
+                </button>
+            {% endif %}
+        </div>
+
+        <!-- Box 10 Lý Do Khách Hàng Nên Chọn Laptop52h -->
+        <div class="reasons-box">
+            <div class="reasons-title">
+                <span>⭐</span> 10 LÝ DO KHÁCH HÀNG NÊN CHỌN LAPTOP52H
+            </div>
+            <div class="reasons-grid">
+                <div class="reason-item">
+                    <span class="reason-num">1</span>
+                    <span>Giao hàng nhanh</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">2</span>
+                    <span>Bảo hành siêu tốc</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">3</span>
+                    <span>Miễn phí cài đặt & vệ sinh</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">4</span>
+                    <span>Sản phẩm chất lượng</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">5</span>
+                    <span>15 ngày dùng thử máy</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">6</span>
+                    <span>Quà tặng hấp dẫn</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">7</span>
+                    <span>Nhiều sản phẩm mới nhất</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">8</span>
+                    <span>Hỗ trợ trả góp 0%</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">9</span>
+                    <span>Hỗ trợ lên đời máy</span>
+                </div>
+                <div class="reason-item">
+                    <span class="reason-num">10</span>
+                    <span>Chu đáo sau bán hàng</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. KHU VỰC CHÍNH: BỘ LỌC BÊN TRÁI + LƯỚI SẢN PHẨM BÊN PHẢI -->
+<div class="shop-main-layout">
+    <!-- CỘT BỘ LỌC BÊN TRÁI -->
+    <aside class="filter-sidebar">
+        <h3 class="filter-sidebar-title">
+            <span>⚙️</span> Bộ lọc sản phẩm
+        </h3>
+
+        <!-- Lọc theo Hãng sản xuất -->
+        <div class="filter-group">
+            <div class="filter-group-header">
+                <span>HÃNG SẢN XUẤT</span>
+                <span>⌵</span>
+            </div>
+            <ul class="filter-item-list">
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="checkbox" onchange="filterByBrand('Lenovo')"> Laptop Lenovo</span>
+                        <span class="filter-count">(380)</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="checkbox" onchange="filterByBrand('Acer')"> Laptop Acer</span>
+                        <span class="filter-count">(225)</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="checkbox" onchange="filterByBrand('Asus')"> Laptop Asus</span>
+                        <span class="filter-count">(226)</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="checkbox" onchange="filterByBrand('Dell')"> Laptop Dell</span>
+                        <span class="filter-count">(75)</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="checkbox" onchange="filterByBrand('Gigabyte')"> Laptop Gigabyte</span>
+                        <span class="filter-count">(33)</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="checkbox" onchange="filterByBrand('HP')"> Laptop HP</span>
+                        <span class="filter-count">(86)</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="checkbox" onchange="filterByBrand('Mechrevo')"> Laptop Mechrevo</span>
+                        <span class="filter-count">(5)</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="checkbox" onchange="filterByBrand('MSI')"> Laptop MSI</span>
+                        <span class="filter-count">(80)</span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Lọc theo Khoảng giá -->
+        <div class="filter-group">
+            <div class="filter-group-header">
+                <span>KHOẢNG GIÁ</span>
+                <span>⌵</span>
+            </div>
+            <ul class="filter-item-list">
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="radio" name="price_range" checked onclick="filterByPrice(0, 999999999)"> Tất cả mức giá</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="radio" name="price_range" onclick="filterByPrice(14500000, 25600000)"> 14.5tr - 25.6 triệu</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="radio" name="price_range" onclick="filterByPrice(25600000, 33100000)"> 25.6tr - 33.1 triệu</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="radio" name="price_range" onclick="filterByPrice(33100000, 41300000)"> 33.1tr - 41.3 triệu</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="filter-checkbox-label">
+                        <span><input type="radio" name="price_range" onclick="filterByPrice(41300000, 250000000)"> Trên 41.3 triệu</span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Link tới trang lọc nâng cao (SQL Injection Lab) -->
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+            <a href="{{ url_for('main.filter_products') }}" class="btn btn-secondary btn-sm" style="width: 100%;">
+                🔍 Bộ lọc chuyên sâu & SQL
+            </a>
+        </div>
+    </aside>
+
+    <!-- CỘT LƯỚI SẢN PHẨM BÊN PHẢI -->
+    <div class="products-content">
+        <!-- Thanh tiêu đề & Sắp xếp -->
+        <div class="products-header-bar">
+            <h2 class="products-category-title">LAPTOP GAMING</h2>
+
+            <div class="products-sort-controls">
+                <span>Sắp xếp theo:</span>
+                <select class="sort-select" id="sort-select" onchange="sortProducts(this.value)">
+                    <option value="newest">Mới nhất</option>
+                    <option value="price_asc">Giá tăng dần</option>
+                    <option value="price_desc">Giá giảm dần</option>
+                    <option value="name_asc">Tên A-Z</option>
+                </select>
+
+                <div style="display: flex; gap: 4px; margin-left: 0.5rem; color: #64748b; font-size: 1.1rem; cursor: pointer;">
+                    <span title="Dạng lưới" style="color: var(--primary-blue);">⊞</span>
+                    <span title="Dạng danh sách">☰</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lưới Laptop -->
+        <div class="product-grid" id="product-grid-container">
+            {% for product in products %}
+                <article class="product-card" id="card-product-{{ product.id }}" data-price="{{ product.price }}" data-name="{{ product.name }}" data-category="{{ product.category }}">
+                    <!-- Huy hiệu Mới / Bán chạy -->
+                    <div class="product-card-badges">
+                        {% if product.id in [1, 2, 4, 6, 7] %}
+                            <span class="badge-new">★ Mới</span>
+                        {% endif %}
+                        {% if product.id in [1, 3, 5, 8] %}
+                            <span class="badge-bestseller">🔥 Bán chạy</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Ảnh Laptop -->
+                    <div class="product-card-img-wrap">
+                        <a href="{{ url_for('product.detail', product_id=product.id) }}">
+                            <img src="{{ product.image_url or url_for('static', filename='images/laptop_acer_v15.svg') }}" alt="{{ product.name }}" id="img-product-{{ product.id }}" loading="lazy">
+                        </a>
+                    </div>
+
+                    <!-- Nội dung thẻ -->
+                    <div class="product-card-body">
+                        <h3 class="product-card-title">
+                            <a href="{{ url_for('product.detail', product_id=product.id) }}" id="title-product-{{ product.id }}">
+                                {{ product.name }}
+                            </a>
+                        </h3>
+
+                        <!-- Hàng giá bán & Giảm giá -->
+                        <div class="product-card-price-row">
+                            <span class="product-card-current-price" id="price-product-{{ product.id }}">
+                                {{ "{:,.0f}".format(product.price) }} đ
+                            </span>
+
+                            {% if product.original_price and product.original_price > product.price %}
+                                {% set discount_pct = (((product.original_price - product.price) / product.original_price) * 100)|round|int %}
+                                <span class="product-card-discount-tag" id="discount-product-{{ product.id }}">
+                                    -{{ discount_pct }}%
+                                </span>
+                                <div class="product-card-old-price" id="old-price-product-{{ product.id }}">
+                                    {{ "{:,.0f}".format(product.original_price) }} đ
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Nút Thêm vào giỏ hàng -->
+                        <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                            <form action="{{ url_for('cart.add_to_cart') }}" method="POST" style="flex: 1; margin: 0;">
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; border-radius: 4px;">
+                                    🛒 Mua Ngay
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- CÁC QUYỀN VÀ TÍNH NĂNG ADMIN TRỰC TIẾP TRÊN THẺ: SỬA GIÁ, ĐỔI ẢNH, XÓA -->
+                        {% if current_user.role == 'admin' %}
+                            <div class="product-card-admin-bar">
+                                <button type="button" class="btn-admin-action" onclick="openAdminPriceModal('{{ product.id }}', '{{ product.name }}', '{{ product.price }}', '{{ product.original_price or product.price }}')" title="Sửa giá laptop trực tiếp">
+                                    ✏️ Sửa giá
+                                </button>
+                                <button type="button" class="btn-admin-action" onclick="openAdminImageModal('{{ product.id }}', '{{ product.name }}', '{{ product.image_url }}')" title="Thêm hoặc đổi ảnh laptop">
+                                    🖼️ Đổi ảnh
+                                </button>
+                                <form action="{{ url_for('admin.delete_product', product_id=product.id) }}" method="POST" style="margin: 0; display: inline;" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                                    <button type="submit" class="btn-admin-action btn-admin-delete" title="Xóa sản phẩm">
+                                        🗑️
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Trung Tâm Thực Hành Bảo Mật (Lab Hub) - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <!-- Header của Trung Tâm Lab -->
+    <div class="lab-header">
+        <div class="lab-title-group">
+            <h1>🔬 Trung Tâm Thực Hành An Toàn Web</h1>
+            <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 0.35rem;">
+                Hệ thống 12 bài thực hành an ninh mạng theo chuẩn OWASP Top 10 trên môi trường Kali Linux / Docker cục bộ.
+            </p>
+        </div>
+
+        <div class="lab-actions">
+            <button type="button" id="btn-all-vuln" class="btn btn-danger btn-sm">
+                🔴 Bật Toàn Bộ Lỗ Hổng
+            </button>
+            <button type="button" id="btn-all-fixed" class="btn btn-success btn-sm">
+                🟢 Vá Toàn Bộ Lỗ Hổng
+            </button>
+            <button type="button" id="btn-reset-db-modal" class="btn btn-secondary btn-sm">
+                🔄 Khôi Phục Dữ Liệu Mẫu
+            </button>
+        </div>
+    </div>
+
+    <!-- Danh sách 12 bài Lab -->
+    <div class="lab-grid">
+        {% for lab in labs %}
+            <article class="lab-card {{ 'is-vuln' if lab.is_vulnerable else 'is-fixed' }}" id="lab-card-{{ lab.id }}">
+                <div class="lab-card-header">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+                            <span class="badge" style="background: rgba(255, 255, 255, 0.08); color: #93c5fd;">
+                                {{ lab.category }}
+                            </span>
+                            <span class="badge {{ 'badge-easy' if lab.difficulty == 'Dễ' else 'badge-medium' }}">
+                                Độ khó: {{ lab.difficulty }}
+                            </span>
+                            <span class="badge {{ 'status-badge-vuln' if lab.is_vulnerable else 'status-badge-fixed' }}" id="status-badge-{{ lab.id }}">
+                                {{ '🔴 Vulnerable' if lab.is_vulnerable else '🟢 Fixed' }}
+                            </span>
+                        </div>
+
+                        <h2 class="lab-card-title">
+                            <a href="{{ url_for('lab.detail', lab_id=lab.id) }}" style="color: #fff;">
+                                {{ loop.index }}. {{ lab.name }}
+                            </a>
+                        </h2>
+                    </div>
+
+                    <!-- Nút gạt Toggle Switch bật/tắt lỗ hổng -->
+                    <div class="switch-container">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Trạng thái:</span>
+                        <label class="switch">
+                            <input type="checkbox" class="lab-toggle-checkbox" data-lab-id="{{ lab.id }}" {{ 'checked' if lab.is_vulnerable else '' }}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">
+                    {{ lab.summary }}
+                </p>
+
+                <div style="background: var(--bg-card); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span style="color: var(--text-dim);">Endpoint liên quan:</span>
+                        <code style="color: #60a5fa; margin-left: 0.25rem;">{{ lab.endpoint }}</code>
+                        <span class="badge" style="background: rgba(255, 255, 255, 0.05); margin-left: 0.5rem;">{{ lab.method }}</span>
+                    </div>
+
+                    <!-- Liên kết trực tiếp tới trang thực nghiệm -->
+                    <div>
+                        {% if lab.id == 'reflected_xss' %}
+                            <a href="{{ url_for('main.search', q='<u>TestLab</u>') }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'stored_xss' or lab.id == 'dom_xss' %}
+                            <a href="{{ url_for('product.detail', product_id=1) }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'sqli' %}
+                            <a href="{{ url_for('main.filter_products') }}?keyword='" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'idor' %}
+                            <a href="{{ url_for('cart.order_detail', order_id=3) }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'broken_access_control' %}
+                            <a href="{{ url_for('admin.orders') }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'csrf' %}
+                            <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'business_logic' %}
+                            <a href="{{ url_for('cart.view_cart') }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'security_misconfig' %}
+                            <a href="{{ url_for('debug.debug_info') }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'command_injection' %}
+                            <a href="{{ url_for('tools.ping') }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'file_upload_shell' %}
+                            <a href="{{ url_for('tools.upload_file') }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% elif lab.id == 'dos_redos' %}
+                            <a href="{{ url_for('tools.validate_coupon') }}" class="btn btn-secondary btn-sm" target="_blank">Thử nghiệm ↗</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Khối Accordion: Gợi ý và Lời giải (Ẩn mặc định) -->
+                <div class="accordion">
+                    <!-- Mục tiêu -->
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>🎯 Mục tiêu bài tập</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            {{ lab.objective }}
+                        </div>
+                    </div>
+
+                    <!-- Gợi ý (Ẩn mặc định) -->
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>💡 Gợi ý phân tích (Gợi ý ẩn)</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <ul style="margin-left: 1.25rem; line-height: 1.6;">
+                                {% for hint in lab.hints %}
+                                    <li>{{ hint }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Lời giải & Cơ chế (Ẩn mặc định) -->
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <span>📖 Hướng dẫn & Cơ chế xác thực (Lời giải ẩn)</span>
+                            <span class="accordion-icon">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p style="margin-bottom: 0.75rem;">{{ lab.solution_overview }}</p>
+                            <a href="{{ url_for('lab.detail', lab_id=lab.id) }}" style="font-weight: 600;">
+                                Xem toàn bộ phân tích nguyên nhân và mã nguồn đã vá →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.25rem; text-align: right;">
+                    <a href="{{ url_for('lab.detail', lab_id=lab.id) }}" class="btn btn-primary btn-sm">
+                        Chi tiết bài lab & So sánh Code Diff →
+                    </a>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal xác nhận Reset Database -->
+<div class="modal-overlay" id="reset-db-modal">
+    <div class="modal-card">
+        <h3 class="modal-header">⚠️ Xác Nhận Khôi Phục Dữ Liệu</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+            Thao tác này sẽ xóa sạch mọi đơn hàng mới tạo, các bình luận thử nghiệm hoặc địa chỉ đã sửa, và đưa toàn bộ cơ sở dữ liệu về trạng thái sạch gốc của phòng lab.
+        </p>
+        <div class="modal-actions">
+            <button type="button" id="btn-reset-cancel" class="btn btn-secondary btn-sm">Hủy bỏ</button>
+            <button type="button" id="btn-reset-confirm" class="btn btn-danger btn-sm">Xác nhận khôi phục</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

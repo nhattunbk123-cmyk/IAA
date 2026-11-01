@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Insecure File Upload & WebShell Lab - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0; max-width: 950px; margin-left: auto; margin-right: auto;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;">Lab 11: File Upload & Web Shell</span>
+                <span class="badge {{ 'status-badge-vuln' if is_vuln else 'status-badge-fixed' }}" id="status-badge-file_upload_shell">
+                    {{ '🔴 Vulnerable' if is_vuln else '🟢 Fixed' }}
+                </span>
+            </div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">📁 Trung Tâm Tải Lên Chứng Từ & Web Shell (PHP2Shell)</h1>
+        </div>
+        <div>
+            <div class="switch-container">
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Trạng thái Lab:</span>
+                <label class="switch">
+                    <input type="checkbox" class="lab-toggle-checkbox" data-lab-id="file_upload_shell" {{ 'checked' if is_vuln else '' }}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+            <span>⚠️ {{ error }}</span>
+        </div>
+    {% endif %}
+
+    <!-- Card Tải Lên Tệp -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: #fff;">Tải lên hóa đơn, ảnh đại diện hoặc chứng từ</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Hệ thống hỗ trợ đính kèm tệp tin xác thực thanh toán. Khai thác lỗ hổng tải tệp không kiểm tra đuôi mở rộng để đưa Web Shell lên máy chủ.
+        </p>
+
+        <form method="POST" action="{{ url_for('tools.upload_file') }}" enctype="multipart/form-data">
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label for="file-input" style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Chọn tệp tin:</label>
+                <input type="file" id="file-input" name="file" class="form-control" required style="padding: 0.5rem;">
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                <button type="submit" class="btn btn-primary">
+                    📤 Tiến Hành Tải Lên Máy Chủ
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="generateSamplePayload('lab_shell.py')">
+                    📋 Tạo & Chọn file mẫu: lab_shell.py
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="generateSamplePayload('test_script.sh')">
+                    📋 Tạo & Chọn file mẫu: test_script.sh
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Thông báo kết quả tải lên gần nhất -->
+    {% if file_info %}
+        <div class="card" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(52, 211, 153, 0.3); margin-bottom: 1.5rem;">
+            <h4 style="color: #34d399; font-size: 1.05rem; margin-bottom: 0.5rem;">✅ Tệp tin vừa được xử lý thành công!</h4>
+            <div style="font-size: 0.9rem; line-height: 1.8;">
+                <div><strong>Tên lưu trữ trên server:</strong> <code>{{ file_info.filename }}</code></div>
+                <div><strong>Kích thước:</strong> {{ (file_info.size / 1024)|round(2) }} KB</div>
+                <div><strong>Đường dẫn truy cập:</strong> <a href="{{ file_info.url }}" target="_blank" style="color: #60a5fa;">{{ file_info.url }} ↗</a></div>
+                
+                {% if file_info.is_script and file_info.shell_url %}
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.15); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        <strong style="color: #f87171;">⚡ Phát hiện tệp mã nguồn độc hại (Web Shell):</strong>
+                        <p style="margin: 0.25rem 0 0.75rem 0; font-size: 0.85rem; color: #fca5a5;">
+                            Ở chế độ Vulnerable, tệp đã nằm trên hệ thống và có thể được kích hoạt thực thi lệnh máy chủ!
+                        </p>
+                        <a href="{{ file_info.shell_url }}" class="btn btn-danger btn-sm" target="_blank">
+                            🚀 Mở Web Shell Interactive Console ↗
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Danh sách tệp đã có trong thư mục Uploads -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <h4 style="font-size: 1.05rem; margin-bottom: 0.75rem; color: #fff;">📂 Danh sách tệp tin trong thư mục Upload</h4>
+        {% if existing_files %}
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                {% for f in existing_files %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.85rem; background: var(--bg-card); border-radius: var(--radius-sm); font-size: 0.9rem; border: 1px solid var(--border-color);">
+                        <div>
+                            <code>{{ f.name }}</code>
+                            <span style="color: var(--text-dim); margin-left: 0.5rem;">({{ (f.size / 1024)|round(2) }} KB)</span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{{ f.url }}" target="_blank" class="btn btn-secondary btn-sm">Xem tệp ↗</a>
+                            {% if f.is_script and is_vuln %}
+                                <a href="{{ url_for('tools.webshell_console', filename=f.name) }}" target="_blank" class="btn btn-danger btn-sm">
+                                    Web Shell ⚡
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Chưa có tệp tin nào được tải lên.</p>
+        {% endif %}
+    </div>
+
+    <!-- Hướng dẫn chi tiết -->
+    <div class="accordion">
+        <div class="accordion-item">
+            <button class="accordion-trigger">
+                <span>🎯 Nguyên nhân cốt lõi & Cơ chế tấn công PHP2Shell</span>
+                <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-content">
+                <p><strong>Cơ chế lỗ hổng:</strong> Trong môi trường web, nếu mã nguồn cho phép tải lên các tệp kịch bản (Script Files như <code>.php</code>, <code>.py</code>, <code>.sh</code>) mà không kiểm tra đuôi tệp, kẻ tấn công có thể biến tệp tin tải lên thành một cổng hậu (Backdoor Web Shell).</p>
+                <ul style="padding-left: 1.25rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    <li><strong>Vulnerable:</strong> Máy chủ lưu nguyên tên tệp mở rộng tùy ý vào thư mục công khai và cho phép người dùng kích hoạt Web Shell.</li>
+                    <li><strong>Fixed:</strong> Máy chủ chỉ cho phép đuôi tệp ảnh hợp lệ (Whitelist: <code>.png, .jpg, .webp, .pdf</code>), đồng thời đổi tên tệp thành UUID ngẫu nhiên để triệt tiêu hoàn toàn khả năng thực thi mã.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function generateSamplePayload(filename) {
+    const content = "#!/usr/bin/env python3\n# VulnShop Lab Web Shell Payload Example\nprint('VulnShop Lab Shell Executed')\n";
+    const blob = new Blob([content], { type: 'text/plain' });
+    const file = new File([blob], filename, { type: 'text/plain' });
+    
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    document.getElementById('file-input').files = dataTransfer.files;
+    alert("Đã tự động tạo và chọn tệp mẫu: " + filename + " vào khung tải lên!");
+}
+</script>
+{% endblock %}

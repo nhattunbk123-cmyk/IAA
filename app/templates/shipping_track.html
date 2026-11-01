@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Tra Cứu Vận Chuyển & Lộ Trình Đơn Hàng - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2.5rem 0; max-width: 960px; margin-left: auto; margin-right: auto;">
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff;">🚚 Tra Cứu Hành Trình Đơn Hàng</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.35rem;">
+            Theo dõi trạng thái bưu kiện theo thời gian thực và kiểm tra tốc độ kết nối tới trạm điều phối vận chuyển.
+        </p>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+            <span>⚠️ {{ error }}</span>
+        </div>
+    {% endif %}
+
+    <!-- Khung tiến độ giao hàng giả lập -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+                <span style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase;">Mã vận đơn bưu điện:</span>
+                <p style="font-size: 1.25rem; font-weight: 800; color: #60a5fa; font-family: monospace;">{{ order_code }}</p>
+            </div>
+            <div>
+                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.9rem; padding: 0.4rem 0.85rem; border: 1px solid #10b981;">
+                    ● Đang giao hàng (Hỏa tốc)
+                </span>
+            </div>
+        </div>
+
+        <!-- Timeline các chặng -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; text-align: center; margin-bottom: 1.5rem;">
+            <div style="padding: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); border-top: 3px solid #10b981;">
+                <span style="font-size: 1.25rem; display: block;">🛒</span>
+                <strong style="font-size: 0.85rem; color: #fff; display: block; margin-top: 0.25rem;">Đặt hàng</strong>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">08:30 - Thành công</span>
+            </div>
+            <div style="padding: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); border-top: 3px solid #10b981;">
+                <span style="font-size: 1.25rem; display: block;">📦</span>
+                <strong style="font-size: 0.85rem; color: #fff; display: block; margin-top: 0.25rem;">Đóng gói</strong>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">10:15 - Kho xuất</span>
+            </div>
+            <div style="padding: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); border-top: 3px solid #3b82f6;">
+                <span style="font-size: 1.25rem; display: block;">🚚</span>
+                <strong style="font-size: 0.85rem; color: #60a5fa; display: block; margin-top: 0.25rem;">Vận chuyển</strong>
+                <span style="font-size: 0.75rem; color: #93c5fd;">Đang trên xe giao</span>
+            </div>
+            <div style="padding: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); border-top: 3px solid var(--border-color);">
+                <span style="font-size: 1.25rem; display: block; opacity: 0.5;">🏠</span>
+                <strong style="font-size: 0.85rem; color: var(--text-dim); display: block; margin-top: 0.25rem;">Giao nhận</strong>
+                <span style="font-size: 0.75rem; color: var(--text-dim);">Dự kiến hôm nay</span>
+            </div>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+            📍 <strong>Vị trí gần nhất:</strong> Bưu cục chuyển phát nhanh khu vực Hà Nội - Bưu tá đang di chuyển tới địa chỉ nhận của quý khách.
+        </p>
+    </div>
+
+    <!-- Form Kiểm Tra Kết Nối Gateway Trạm Bưu Cục -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">
+            📡 Kiểm Tra Tín Hiệu Kết Nối Trạm Điều Phối Vận Chuyển
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Hệ thống cho phép nhân viên vận chuyển và khách hàng kiểm tra độ trễ mạng (ICMP Ping) tới máy chủ đối tác bưu cục (Giao Hàng Nhanh, ViettelPost, VNPost Gateway).
+        </p>
+
+        <form method="POST" action="{{ url_for('shipping.tracking') }}">
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr auto; gap: 0.75rem; align-items: end;">
+                <div>
+                    <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.35rem;">Mã vận đơn:</label>
+                    <input type="text" name="order_code" value="{{ order_code }}" class="form-control" placeholder="Mã vận đơn...">
+                </div>
+                <div>
+                    <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.35rem;">Máy chủ trạm bưu cục / Gateway IP:</label>
+                    <input type="text" name="partner_gateway" id="gateway-input" value="{{ partner_gateway }}" class="form-control" placeholder="127.0.0.1 hoặc domain trạm..." required>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary" style="white-space: nowrap; height: 42px;">
+                        ⚡ Kiểm Tra Tín Hiệu
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Trạm đối tác mẫu -->
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--text-dim);">Trạm kết nối mẫu:</span>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="setGateway('127.0.0.1')">
+                Trạm cục bộ (127.0.0.1)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="setGateway('localhost')">
+                Trạm trung tâm (localhost)
+            </button>
+        </div>
+    </div>
+
+    <!-- Kết Quả Kiểm Tra Tín Hiệu -->
+    {% if ping_output %}
+        <div class="card" style="background: #030712; border-color: #1e293b; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.5rem;">
+                <span style="font-family: monospace; font-size: 0.85rem; color: #94a3b8;">
+                    📡 Kết quả phản hồi từ trạm điều phối [{{ partner_gateway }}]:
+                </span>
+            </div>
+            <pre style="font-family: 'Consolas', 'Courier New', monospace; font-size: 0.9rem; color: #34d399; line-height: 1.5; white-space: pre-wrap; word-break: break-all; margin: 0; padding: 0.5rem 0;">{{ ping_output }}</pre>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function setGateway(val) {
+    document.getElementById('gateway-input').value = val;
+}
+</script>
+{% endblock %}

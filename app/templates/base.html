@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Laptop52h.vn - Hệ Thống Bán Lẻ Laptop Gaming & Công Nghệ Hàng Đầu{% endblock %}</title>
+    <meta name="description" content="Laptop52h.vn chuyên phân phối laptop gaming, phụ kiện máy tính chính hãng giá tốt, bảo hành siêu tốc, giao hàng toàn quốc.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <!-- 0. THANH ĐIỀU HÀNH ADMIN KHI ĐĂNG NHẬP VỚI QUYỀN ADMIN -->
+    {% if current_user.role == 'admin' %}
+        <div class="admin-top-bar" id="admin-top-bar">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="admin-badge">👑 Admin</span>
+                <span>Xin chào: <strong>{{ current_user.full_name }}</strong> (<code>{{ current_user.username }}</code>)</span>
+            </div>
+            <div class="admin-actions">
+                <button type="button" class="admin-btn" id="btn-open-quick-add">
+                    ➕ Thêm Laptop Mới
+                </button>
+                <a href="{{ url_for('admin.orders') }}" class="admin-btn">
+                    📦 Quản lý Đơn hàng
+                </a>
+                <a href="{{ url_for('admin.users') }}" class="admin-btn">
+                    👥 Người dùng
+                </a>
+                <a href="{{ url_for('admin.access_logs') }}" class="admin-btn" style="background: rgba(14, 165, 233, 0.3); border-color: #0ea5e9;">
+                    🕒 Nhật ký truy cập
+                </a>
+                <a href="{{ url_for('admin.dashboard') }}" class="admin-btn">
+                    ⚡ Trang Quản Trị
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="admin-btn" style="background: rgba(239, 68, 68, 0.3);">
+                    Đăng xuất
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 1. HEADER TRÊN CÙNG: MÀU TRẮNG TINH (LAPTOP52H.VN) -->
+    <header class="header-top">
+        <div class="container header-top-inner">
+            <!-- Logo Laptop52h.vn -->
+            <a href="{{ url_for('main.index') }}" class="header-brand" id="brand-logo-link">
+                <img src="{{ url_for('static', filename='images/logo_laptop52h.svg') }}" alt="Laptop52h.vn Logo" height="46">
+            </a>
+
+            <!-- Thanh tìm kiếm sản phẩm (Tích hợp Reflected XSS) -->
+            <form action="{{ url_for('main.search') }}" method="GET" class="header-search-form" id="nav-search-form">
+                <input type="text" name="q" placeholder="Bạn tìm gì..." class="header-search-input" value="{{ query if query is defined else '' }}" required>
+                <button type="submit" class="header-search-btn" title="Tìm kiếm">
+                    🔍
+                </button>
+            </form>
+
+            <!-- Cụm nút tác vụ bên phải: Đăng nhập duy nhất, Hotline, Giỏ hàng -->
+            <div class="header-actions">
+                <!-- NÚT ĐĂNG NHẬP DUY NHẤT: CẢ KHÁCH HÀNG VÀ ADMIN ĐỀU ĐĂNG NHẬP Ở ĐÂY -->
+                {% if current_user.id %}
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <a href="{{ url_for('auth.profile') }}" class="btn-header-user" title="Hồ sơ cá nhân">
+                            👤 <span>{{ current_user.full_name.split(' ')[0] if current_user.full_name else 'Tài khoản' }}</span>
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="btn-header-user" style="color: #ef4444 !important; font-size: 0.8rem; padding: 0.45rem 0.65rem;" title="Đăng xuất">
+                            Thoát
+                        </a>
+                    </div>
+                {% else %}
+                    <button type="button" class="btn-header-login" id="btn-open-login-modal">
+                        👤 <span>Đăng nhập</span>
+                    </button>
+                {% endif %}
+
+                <!-- Hotline tư vấn -->
+                <a href="tel:0825233233" class="header-hotline">
+                    <div class="hotline-icon">🎧</div>
+                    <div>
+                        <div class="hotline-text">Hotline tư vấn</div>
+                        <div class="hotline-number">0825 233 233</div>
+                    </div>
+                </a>
+
+                <!-- Giỏ hàng -->
+                <a href="{{ url_for('cart.view_cart') }}" class="header-cart-btn" id="nav-cart-link">
+                    <span>🛒</span>
+                    <span class="cart-count-badge">{{ cart_count if cart_count else 0 }}</span>
+                    <span>Giỏ hàng</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. SUB-NAVBAR: MÀU XANH DƯƠNG ĐẶC TRƯNG (#1967d2) -->
+    <nav class="sub-navbar">
+        <div class="container">
+            <ul class="sub-nav-list">
+                <li class="sub-nav-item category-menu">
+                    <a href="{{ url_for('main.product_list') }}">
+                        <span>☰</span> Danh mục sản phẩm <span>⌵</span>
+                    </a>
+                </li>
+                <li class="sub-nav-item">
+                    <a href="{{ url_for('main.product_list') }}#promo">🏷️ Khuyến mãi</a>
+                </li>
+                <li class="sub-nav-item">
+                    <a href="{{ url_for('main.product_list') }}">💳 Trả góp</a>
+                </li>
+                <li class="sub-nav-item">
+                    <a href="{{ url_for('main.product_list') }}">🔄 Đổi trả hàng</a>
+                </li>
+                <li class="sub-nav-item">
+                    <a href="{{ url_for('shipping.tracking') }}" style="background: rgba(255, 255, 255, 0.1);">🚚 Tra cứu đơn hàng</a>
+                </li>
+                <li class="sub-nav-item">
+                    <a href="{{ url_for('main.index') }}#gioi-thieu">ℹ️ Giới thiệu</a>
+                </li>
+                <li class="sub-nav-item">
+                    <a href="{{ url_for('main.index') }}#lien-he">📞 Liên hệ</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 3. MAIN CONTENT CONTAINER -->
+    <main class="container" style="flex: 1;">
+        <!-- Flash Alert Messages -->
+        <div class="flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span>{{ message }}</span>
+                            <button type="button" style="background:none; border:none; color:inherit; cursor:pointer;" onclick="this.parentElement.remove();">✕</button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 4. MODAL ĐĂNG NHẬP G-AUTH / GEARVN STYLE (HÌNH ẢNH 2) -->
+    <div class="auth-modal-backdrop" id="login-modal-backdrop">
+        <div class="auth-modal-box">
+            <!-- Nút đóng ✕ -->
+            <button type="button" class="auth-modal-close" id="btn-close-login-modal">✕</button>
+
+            <!-- Tiêu đề & Phụ đề -->
+            <div class="auth-modal-header">
+                <h2 class="auth-modal-title">Đăng nhập</h2>
+                <p class="auth-modal-subtitle">Nhận ưu đãi thành viên và theo dõi đơn hàng dễ dàng.</p>
+            </div>
+
+            <!-- Nút Đăng nhập Google -->
+            <button type="button" class="btn-google-auth" onclick="showToast('Đăng nhập Google mô phỏng (Hãy đăng nhập bằng username)', 'info');">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+                </svg>
+                <span>Tiếp tục sử dụng dịch vụ bằng Google</span>
+            </button>
+
+            <!-- Dải phân cách HOẶC -->
+            <div class="auth-divider">
+                <span>HOẶC</span>
+            </div>
+
+            <!-- Form Đăng nhập chuẩn -->
+            <form action="{{ url_for('auth.login') }}" method="POST" id="modal-login-form">
+                <div class="auth-input-group">
+                    <input type="text" id="modal-username" name="username" class="auth-input-control" placeholder="Số điện thoại, email hoặc tên đăng nhập" required autofocus>
+                </div>
+
+                <div class="auth-input-group">
+                    <input type="password" id="modal-password" name="password" class="auth-input-control" placeholder="Mật khẩu" required>
+                </div>
+
+                <!-- Checkbox Ghi nhớ & Quên mật khẩu -->
+                <div class="auth-options-row">
+                    <label class="auth-remember-label">
+                        <input type="checkbox" name="remember" checked>
+                        <span>Ghi nhớ đăng nhập</span>
+                    </label>
+                    <a href="{{ url_for('auth.forgot_password') }}" class="auth-forgot-link">
+                        Quên mật khẩu?
+                    </a>
+                </div>
+
+                <!-- Nút Đăng nhập to màu đỏ -->
+                <button type="submit" class="btn-auth-submit" id="btn-submit-modal-login">
+                    Đăng nhập
+                </button>
+
+                <div style="margin-top: 1rem; padding: 0.6rem 0.8rem; background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 8px; font-size: 0.75rem; color: var(--text-muted); text-align: left; line-height: 1.5;">
+                    <div style="font-weight: 700; color: #0284c7; margin-bottom: 0.15rem; display: flex; align-items: center; gap: 0.35rem;">
+                        <span>🛡️</span> Bảo mật tài khoản nâng cao:
+                    </div>
+                    • Tự động khóa tài khoản <strong>5 phút</strong> nếu nhập sai mật khẩu 5 lần liên tiếp.
+                </div>
+            </form>
+
+            <!-- Footer: Đăng ký -->
+            <div class="auth-modal-footer">
+                Chưa có tài khoản? <a href="{{ url_for('auth.register') }}">Đăng ký ngay</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. MODAL DÀNH CHO ADMIN: SỬA GIÁ NHANH TRỰC TIẾP TRÊN CARD SẢN PHẨM -->
+    {% if current_user.role == 'admin' %}
+        <div class="admin-modal-backdrop" id="modal-edit-price-backdrop">
+            <div class="admin-modal-box">
+                <button type="button" class="auth-modal-close" onclick="closeAdminPriceModal()">✕</button>
+                <h3 class="admin-modal-title">✏️ Cập Nhật Giá Bán Laptop</h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;" id="modal-edit-product-name">
+                    Sản phẩm: ...
+                </p>
+
+                <form id="form-quick-edit-price">
+                    <input type="hidden" id="quick-price-product-id" name="product_id">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Giá bán mới (VNĐ):</label>
+                        <input type="number" id="quick-price-val" name="price" class="form-control" placeholder="Ví dụ: 25890000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Giá niêm yết cũ / Giá gốc (VNĐ):</label>
+                        <input type="number" id="quick-original-price-val" name="original_price" class="form-control" placeholder="Ví dụ: 28140000">
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" onclick="closeAdminPriceModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-quick-price">💾 Lưu Thay Đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL DÀNH CHO ADMIN: ĐỔI ẢNH / THÊM ẢNH SẢN PHẨM -->
+        <div class="admin-modal-backdrop" id="modal-edit-image-backdrop">
+            <div class="admin-modal-box">
+                <button type="button" class="auth-modal-close" onclick="closeAdminImageModal()">✕</button>
+                <h3 class="admin-modal-title">🖼️ Đổi Ảnh Sản Phẩm</h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;" id="modal-edit-image-product-name">
+                    Sản phẩm: ...
+                </p>
+
+                <form id="form-quick-edit-image" enctype="multipart/form-data">
+                    <input type="hidden" id="quick-image-product-id" name="product_id">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tải lên tệp ảnh từ máy tính:</label>
+                        <input type="file" id="quick-image-file" name="image_file" class="form-control" accept="image/*">
+                    </div>
+
+                    <div style="text-align: center; color: var(--text-dim); font-size: 0.8rem; margin: 0.5rem 0;">— HOẶC —</div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nhập URL đường dẫn ảnh trực tiếp:</label>
+                        <input type="text" id="quick-image-url" name="image_url" class="form-control" placeholder="/static/images/laptop_acer_v15.svg hoặc https://...">
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" onclick="closeAdminImageModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-quick-image">🖼️ Cập Nhật Ảnh</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL DÀNH CHO ADMIN: THÊM LAPTOP MỚI NHANH -->
+        <div class="admin-modal-backdrop" id="modal-quick-add-backdrop">
+            <div class="admin-modal-box" style="max-width: 580px;">
+                <button type="button" class="auth-modal-close" onclick="closeAdminAddModal()">✕</button>
+                <h3 class="admin-modal-title">➕ Thêm Laptop Mới Vào Cửa Hàng</h3>
+
+                <form action="{{ url_for('admin.quick_add_product') }}" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Tên Laptop:</label>
+                        <input type="text" name="name" class="form-control" placeholder="Ví dụ: Laptop Lenovo Legion 5 2026 | Ryzen 7, RTX 4060..." required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Hãng / Danh mục:</label>
+                            <select name="category" class="form-control">
+                                <option value="Laptop Lenovo">Laptop Lenovo</option>
+                                <option value="Laptop Acer">Laptop Acer</option>
+                                <option value="Laptop Asus">Laptop Asus</option>
+                                <option value="Laptop Dell">Laptop Dell</option>
+                                <option value="Laptop HP">Laptop HP</option>
+                                <option value="Laptop Gigabyte">Laptop Gigabyte</option>
+                                <option value="Laptop MSI">Laptop MSI</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số lượng tồn kho:</label>
+                            <input type="number" name="stock" class="form-control" value="25">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Giá bán (VNĐ):</label>
+                            <input type="number" name="price" class="form-control" placeholder="25990000" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Giá gốc niêm yết (VNĐ):</label>
+                            <input type="number" name="original_price" class="form-control" placeholder="28990000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Chọn ảnh từ máy hoặc nhập URL:</label>
+                        <input type="file" name="image_file" class="form-control" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mô tả cấu hình tóm tắt:</label>
+                        <textarea name="description" rows="2" class="form-control" placeholder="CPU Core i7, RAM 16GB, SSD 512GB, RTX 4060..."></textarea>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
+                        <button type="button" class="btn btn-secondary" onclick="closeAdminAddModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary">➕ Thêm Laptop</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL DÀNH CHO ADMIN: ĐỔI ẢNH BANNER TRANG CHỦ -->
+        <div class="admin-modal-backdrop" id="modal-edit-banner-backdrop">
+            <div class="admin-modal-box">
+                <button type="button" class="auth-modal-close" onclick="closeBannerEditModal()">✕</button>
+                <h3 class="admin-modal-title">🖼️ Đổi Ảnh Banner Trang Chủ</h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;" id="modal-edit-banner-name">
+                    Banner: ...
+                </p>
+
+                <form id="form-quick-edit-banner" enctype="multipart/form-data">
+                    <input type="hidden" id="quick-banner-key" name="banner_key">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tải lên tệp ảnh từ máy tính:</label>
+                        <input type="file" id="quick-banner-file" name="banner_file" class="form-control" accept="image/*">
+                    </div>
+
+                    <div style="text-align: center; color: var(--text-dim); font-size: 0.8rem; margin: 0.5rem 0;">— HOẶC —</div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nhập URL đường dẫn ảnh trực tiếp:</label>
+                        <input type="text" id="quick-banner-url" name="banner_url" class="form-control" placeholder="/static/images/banner_nitro_v15.svg hoặc https://...">
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" onclick="closeBannerEditModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-quick-banner">🖼️ Cập Nhật Banner</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 6. FOOTER CHUYÊN NGHIỆP LAPTOP52H.VN -->
+    <footer class="shop-footer">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div>
+                    <img src="{{ url_for('static', filename='images/logo_laptop52h.svg') }}" alt="Laptop52h.vn Logo" height="38" style="margin-bottom: 0.75rem;">
+                    <p style="line-height: 1.6; color: var(--text-muted);">
+                        Hệ thống bán lẻ laptop gaming, máy tính đồ họa và thiết bị công nghệ chính hãng hàng đầu Việt Nam.
+                    </p>
+                    <p style="margin-top: 0.75rem; font-weight: 700; color: var(--text-main);">
+                        📍 Địa chỉ: Số 18, ngõ 121 Thái Hà, Đống Đa, Hà Nội
+                    </p>
+                </div>
+
+                <div>
+                    <h4>Chính Sách & Hỗ Trợ</h4>
+                    <ul>
+                        <li><a href="{{ url_for('shipping.tracking') }}">🚚 Tra cứu lộ trình đơn hàng</a></li>
+                        <li><a href="{{ url_for('main.product_list') }}">Bảo hành siêu tốc & đổi mới 15 ngày</a></li>
+                        <li><a href="#">Chính sách trả góp 0% lãi suất</a></li>
+                        <li><a href="#">Chăm sóc khách hàng: 0825 233 233</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4>Thanh Toán & Vận Chuyển</h4>
+                    <p style="line-height: 1.8; color: var(--text-muted);">
+                        💵 Thanh toán trực tiếp khi nhận hàng (COD)<br>
+                        💳 Chuyển khoản ngân hàng & thẻ tín dụng<br>
+                        🚚 Miễn phí giao hàng nội thành toàn quốc
+                    </p>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.8rem;">
+                <p>© 2026 Laptop52h.vn - All rights reserved.</p>
+                <div>
+                    <a href="{{ url_for('lab.index') }}" style="color: var(--text-dim); text-decoration: none;" title="Cấu hình bài thực hành bảo mật">
+                        ⚙️ Bảng điều khiển quản lý lỗ hổng (Lab Settings)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lab.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

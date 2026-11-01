@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Công Cụ Kiểm Thử Mở Rộng - VulnShop Lab{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <div class="lab-header">
+        <div class="lab-title-group">
+            <h1>🛠️ Bộ Công Cụ Kiểm Thử An Ninh Mở Rộng</h1>
+            <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 0.35rem;">
+                Các tiện ích hệ thống mô phỏng chuyên sâu: OS Command Injection, Insecure File Upload to WebShell (PHP2Shell), và Denial of Service (ReDoS).
+            </p>
+        </div>
+        <div class="lab-actions">
+            <a href="{{ url_for('lab.index') }}" class="btn btn-secondary btn-sm">
+                🔬 Xem Trung Tâm 12 Bài Lab
+            </a>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+        <!-- Card 1: Command Injection -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        Injection Flaw
+                    </span>
+                    <span class="badge badge-medium">Lab 10</span>
+                </div>
+                <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">
+                    🌐 Chẩn Đoán Kết Nối Mạng (Ping Tool)
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                    Tiện ích cho phép kiểm tra độ trễ mạng tới máy chủ đối tác. Khai thác lỗ hổng <strong>OS Command Injection</strong> bằng cách ghép chuỗi lệnh shell trực tiếp.
+                </p>
+            </div>
+            <div>
+                <a href="{{ url_for('tools.ping') }}" class="btn btn-primary" style="width: 100%; text-align: center;">
+                    Mở Công Cụ Ping & Injection ↗
+                </a>
+            </div>
+        </div>
+
+        <!-- Card 2: File Upload WebShell -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3);">
+                        Core Language & RCE
+                    </span>
+                    <span class="badge badge-medium" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">Độ khó: Khó</span>
+                </div>
+                <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">
+                    📁 Tải Lên Chứng Từ & Web Shell (PHP2Shell)
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                    Mô phỏng chuỗi tấn công kinh điển <strong>Upload to Shell / PHP2Shell</strong>: Tải lên mã nguồn tùy ý (.php, .py, .sh) và kích hoạt Web Shell Console trực tuyến để kiểm soát máy chủ.
+                </p>
+            </div>
+            <div>
+                <a href="{{ url_for('tools.upload_file') }}" class="btn btn-primary" style="width: 100%; text-align: center;">
+                    Mở Upload Center & Web Shell ↗
+                </a>
+            </div>
+        </div>
+
+        <!-- Card 3: DoS ReDoS -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
+                        Denial of Service
+                    </span>
+                    <span class="badge badge-medium">Lab 12</span>
+                </div>
+                <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">
+                    ⚡ Xác Thực Mã Giảm Giá & DoS (ReDoS)
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                    Kiểm tra định dạng voucher qua Regular Expression. Khai thác lỗi <strong>Catastrophic Backtracking</strong> để làm đóng băng CPU máy chủ, gây từ chối dịch vụ.
+                </p>
+            </div>
+            <div>
+                <a href="{{ url_for('tools.validate_coupon') }}" class="btn btn-primary" style="width: 100%; text-align: center;">
+                    Mở Trình Xác Thực & Test ReDoS ↗
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

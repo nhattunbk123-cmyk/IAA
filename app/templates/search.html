@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Kết quả tìm kiếm cho: {{ query }} - Laptop52h.vn{% endblock %}
+
+{% block content %}
+<div class="breadcrumb-bar" style="margin-top: 1rem;">
+    <a href="{{ url_for('main.index') }}">Trang chủ</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">Tìm kiếm: {{ query }}</span>
+</div>
+
+<div style="margin-bottom: 3rem;">
+    <div class="products-header-bar" style="margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="products-category-title" style="font-size: 1.4rem;">Kết Quả Tìm Kiếm</h1>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.35rem;" id="search-reflection-text">
+                Tìm kiếm cho từ khóa: <strong style="color: var(--primary-blue);">{{ rendered_query }}</strong>
+            </p>
+        </div>
+    </div>
+
+    <!-- Kết quả -->
+    {% if products %}
+        <div class="product-grid">
+            {% for product in products %}
+                <article class="product-card" id="card-product-{{ product.id }}">
+                    <div class="product-card-img-wrap">
+                        <a href="{{ url_for('product.detail', product_id=product.id) }}">
+                            <img src="{{ product.image_url or url_for('static', filename='images/laptop_acer_v15.svg') }}" alt="{{ product.name }}" id="img-product-{{ product.id }}" loading="lazy">
+                        </a>
+                    </div>
+                    <div class="product-card-body">
+                        <h3 class="product-card-title">
+                            <a href="{{ url_for('product.detail', product_id=product.id) }}">{{ product.name }}</a>
+                        </h3>
+                        <div class="product-card-price-row">
+                            <span class="product-card-current-price">{{ "{:,.0f}".format(product.price) }} đ</span>
+                            {% if product.original_price and product.original_price > product.price %}
+                                <div class="product-card-old-price">{{ "{:,.0f}".format(product.original_price) }} đ</div>
+                            {% endif %}
+                        </div>
+                        <div style="margin-top: 0.75rem;">
+                            <form action="{{ url_for('cart.add_to_cart') }}" method="POST" style="margin: 0;">
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">🛒 Mua Ngay</button>
+                            </form>
+                        </div>
+                        {% if current_user.role == 'admin' %}
+                            <div class="product-card-admin-bar">
+                                <button type="button" class="btn-admin-action" onclick="openAdminPriceModal('{{ product.id }}', '{{ product.name }}', '{{ product.price }}', '{{ product.original_price or product.price }}')">
+                                    ✏️ Sửa giá
+                                </button>
+                                <button type="button" class="btn-admin-action" onclick="openAdminImageModal('{{ product.id }}', '{{ product.name }}', '{{ product.image_url }}')">
+                                    🖼️ Đổi ảnh
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 1rem; background: #ffffff; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+            <h3 style="color: var(--text-main);">Không tìm thấy sản phẩm nào khớp với từ khóa của bạn.</h3>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">Hãy thử từ khóa khác hoặc quay lại <a href="{{ url_for('main.index') }}">trang chủ</a>.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

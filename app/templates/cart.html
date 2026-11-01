@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Giỏ Hàng & Thanh Toán - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2.5rem 0;">
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff;">🛒 Giỏ Hàng Của Bạn</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Kiểm tra danh sách sản phẩm và hoàn tất đặt hàng.</p>
+    </div>
+
+    {% if cart_items %}
+        <div style="display: grid; grid-template-columns: 2fr 1.25fr; gap: 2rem; align-items: start;">
+            <!-- Danh sách sản phẩm trong giỏ -->
+            <div>
+                <form action="{{ url_for('cart.update_cart') }}" method="POST">
+                    <div class="table-responsive" style="margin-top: 0; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color); overflow: hidden;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Đơn giá</th>
+                                    <th style="width: 120px;">Số lượng</th>
+                                    <th>Thành tiền</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('product.detail', product_id=item.product.id) }}" style="font-weight: 600; color: #fff;">
+                                                {{ item.product.name }}
+                                            </a>
+                                        </td>
+                                        <td>{{ "{:,.0f}".format(item.product.price) }} đ</td>
+                                        <td>
+                                            <input type="number" name="quantity_{{ item.product.id }}" value="{{ item.quantity }}" min="1" max="99" class="form-control" style="padding: 0.35rem 0.5rem; text-align: center;">
+                                        </td>
+                                        <td style="color: #34d399; font-weight: 700;">{{ "{:,.0f}".format(item.subtotal) }} đ</td>
+                                        <td>
+                                            <button type="submit" formaction="{{ url_for('cart.remove_from_cart', product_id=item.product.id) }}" class="btn btn-danger btn-sm" style="padding: 0.25rem 0.5rem;">✕</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+                        <button type="submit" class="btn btn-secondary btn-sm">🔄 Cập nhật số lượng</button>
+                    </div>
+                </form>
+
+                <!-- Tính năng can thiệp giá ưu đãi / Giá tùy chỉnh (Business Logic Flaw) -->
+                <div style="margin-top: 2rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem;">
+                    <details>
+                        <summary style="cursor: pointer; font-size: 0.9rem; font-weight: 600; color: #93c5fd;">
+                            ⚙️ Tùy chọn đặt hàng nhanh (Dành cho đại lý & đối tác bán sỉ)
+                        </summary>
+                        <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                            <form action="{{ url_for('cart.checkout') }}" method="POST" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end;">
+                                <div>
+                                    <label class="form-label" style="font-size: 0.8rem;">Sản phẩm chiết khấu:</label>
+                                    <select name="tampered_product_id" class="form-control" style="font-size: 0.85rem;">
+                                        {% for item in cart_items %}
+                                            <option value="{{ item.product.id }}">{{ item.product.name }} (Giá niêm yết: {{ "{:,.0f}".format(item.product.price) }}đ)</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label" style="font-size: 0.8rem;">Giá thỏa thuận (VND):</label>
+                                    <input type="number" name="custom_price" value="1000" class="form-control" style="font-size: 0.85rem;">
+                                </div>
+                                <div>
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="height: 38px;">Xác nhận giá đại lý</button>
+                                </div>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- Khung thanh toán & Mã giảm giá -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+                <!-- Mã giảm giá Voucher (ReDoS) -->
+                <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                    <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 0.5rem; color: #fff;">
+                        🎟️ Mã Giảm Giá / Voucher Ưu Đãi:
+                    </label>
+                    <form action="{{ url_for('cart.apply_coupon') }}" method="POST" style="display: flex; gap: 0.5rem;">
+                        <input 
+                            type="text" 
+                            name="coupon_code" 
+                            placeholder="Nhập mã ưu đãi..." 
+                            class="form-control" 
+                            style="font-size: 0.85rem; flex: 1;"
+                            value="{{ session.get('applied_coupon', '') }}"
+                        >
+                        <button type="submit" class="btn btn-secondary btn-sm" style="white-space: nowrap;">
+                            Áp Dụng
+                        </button>
+                    </form>
+                    {% if session.get('applied_coupon') %}
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #34d399;">
+                            ✓ Đã áp dụng mã: <strong>{{ session.get('applied_coupon') }}</strong> (-15%)
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff;">Thông Tin Đặt Hàng</h2>
+
+                <form action="{{ url_for('cart.checkout') }}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600;">Địa chỉ nhận hàng:</label>
+                        <textarea name="shipping_address" rows="2" class="form-control" required>{{ current_user.address or 'Số 123 Đường Cầu Giấy, Q. Cầu Giấy, Hà Nội' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600;">Phương thức thanh toán:</label>
+                        <select name="payment_method" class="form-control">
+                            <option value="COD (Thanh toán khi nhận)">📦 COD (Thanh toán khi nhận hàng)</option>
+                            <option value="Chuyển khoản ngân hàng">💳 Chuyển khoản ngân hàng</option>
+                            <option value="Ví điện tử MoMo/ZaloPay">📱 Ví điện tử</option>
+                        </select>
+                    </div>
+
+                    <div style="margin: 1.5rem 0; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: baseline;">
+                        <span style="font-size: 1.05rem; font-weight: 600;">Tổng thanh toán:</span>
+                        <span style="font-size: 1.5rem; font-weight: 800; color: #34d399;">{{ "{:,.0f}".format(total_amount) }} đ</span>
+                    </div>
+
+                    {% if current_user.id %}
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem;">
+                            ✅ Xác Nhận Đặt Hàng
+                        </button>
+                    {% else %}
+                        <a href="{{ url_for('auth.login', next=url_for('cart.view_cart')) }}" class="btn btn-primary" style="width: 100%; padding: 0.85rem;">
+                            🔑 Đăng Nhập Để Đặt Hàng
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 1rem; background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🛒</div>
+            <h2>Giỏ hàng của bạn đang trống!</h2>
+            <p style="color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 1.5rem;">Hãy khám phá các thiết bị công nghệ mới nhất để tiếp tục mua sắm.</p>
+            <a href="{{ url_for('main.product_list') }}" class="btn btn-primary">🛍️ Khám phá sản phẩm ngay</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Bảng Điều Khiển Quản Trị - Laptop52h.vn{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff;">⚡ Quản Trị Hệ Thống</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Tổng quan hoạt động kinh doanh, dữ liệu người dùng và lịch sử truy cập</p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="{{ url_for('admin.products') }}" class="btn btn-secondary btn-sm">📦 Quản lý sản phẩm</a>
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-secondary btn-sm">📑 Quản lý đơn hàng</a>
+            <a href="{{ url_for('admin.users') }}" class="btn btn-secondary btn-sm">👥 Người dùng</a>
+            <a href="{{ url_for('admin.access_logs') }}" class="btn btn-primary btn-sm" style="background: #0ea5e9; border-color: #0ea5e9;">🕒 Ai vào web & Thời gian</a>
+        </div>
+    </div>
+
+    <!-- 6 Khối Thống Kê Tổng Quan -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.35rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Tổng Doanh Thu</span>
+            <div style="font-size: 1.65rem; font-weight: 800; color: #34d399; margin-top: 0.5rem;">
+                {{ "{:,.0f}".format(total_revenue) }} đ
+            </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.35rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Tổng Đơn Hàng</span>
+            <div style="font-size: 1.65rem; font-weight: 800; color: #60a5fa; margin-top: 0.5rem;">
+                {{ total_orders }}
+            </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.35rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Sản Phẩm Trong Kho</span>
+            <div style="font-size: 1.65rem; font-weight: 800; color: #fbbf24; margin-top: 0.5rem;">
+                {{ total_products }}
+            </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.35rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Người Dùng Đăng Ký</span>
+            <div style="font-size: 1.65rem; font-weight: 800; color: #a78bfa; margin-top: 0.5rem;">
+                {{ total_users }}
+            </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid rgba(14, 165, 233, 0.4); border-radius: var(--radius-lg); padding: 1.35rem; position: relative; overflow: hidden;">
+            <div style="position: absolute; right: 12px; top: 12px; font-size: 1.5rem; opacity: 0.25;">🕒</div>
+            <span style="font-size: 0.85rem; color: #7dd3fc; text-transform: uppercase; font-weight: 600;">Truy Cập Hôm Nay</span>
+            <div style="font-size: 1.65rem; font-weight: 800; color: #38bdf8; margin-top: 0.5rem;">
+                {{ today_visits }} <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">lượt</span>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.35rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Tổng Lượt Vào Web</span>
+            <div style="font-size: 1.65rem; font-weight: 800; color: #c084fc; margin-top: 0.5rem;">
+                {{ total_visits }} <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">lượt</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- KHỐI 1: LỊCH SỬ TRUY CẬP GẦN ĐÂY (AI VÀO WEB VÀ THỜI GIAN) -->
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem; margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🕒</span> Ai Đang Vào Web & Thời Gian Truy Cập Gần Đây
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Ghi nhận theo thời gian thực danh tính, thời điểm, IP và trang web khách ghé thăm</p>
+            </div>
+            <a href="{{ url_for('admin.access_logs') }}" class="btn btn-secondary btn-sm" style="font-weight: 600; color: #38bdf8;">
+                Xem toàn bộ nhật ký ({{ total_visits }}) →
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="min-width: 160px;">Thời Gian</th>
+                        <th style="min-width: 180px;">Ai Vào Web</th>
+                        <th>Địa Chỉ IP</th>
+                        <th>Trang Đã Xem</th>
+                        <th>Thiết Bị / Trình Duyệt</th>
+                        <th style="text-align: center;">Mã HTTP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if recent_visits %}
+                        {% for v in recent_visits %}
+                            {% set dev = v.user_agent | parse_device %}
+                            <tr>
+                                <!-- Thời gian -->
+                                <td style="font-size: 0.85rem; color: #f1f5f9; font-weight: 600; white-space: nowrap;">
+                                    <span style="color: #38bdf8;">🕒</span> {{ v.created_at }}
+                                </td>
+
+                                <!-- Ai vào web -->
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        {% if v.role == 'admin' %}
+                                            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; font-size: 0.75rem;">
+                                                👑 Admin
+                                            </span>
+                                            <div>
+                                                <div style="font-weight: 700; color: #fff;">{{ v.full_name }}</div>
+                                                <small style="color: #93c5fd;">@{{ v.username }}</small>
+                                            </div>
+                                        {% elif v.role == 'user' %}
+                                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; font-size: 0.75rem;">
+                                                👤 Khách hàng
+                                            </span>
+                                            <div>
+                                                <div style="font-weight: 700; color: #fff;">{{ v.full_name }}</div>
+                                                <small style="color: #93c5fd;">@{{ v.username }}</small>
+                                            </div>
+                                        {% else %}
+                                            <span class="badge" style="background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid #64748b; font-size: 0.75rem;">
+                                                🌐 Khách vãng lai
+                                            </span>
+                                            <span style="color: var(--text-muted); font-size: 0.85rem;">Chưa đăng nhập</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <!-- IP -->
+                                <td>
+                                    <code style="background: rgba(0,0,0,0.3); padding: 0.2rem 0.45rem; border-radius: 4px; color: #a5f3fc; font-size: 0.8rem;">
+                                        {{ v.ip_address }}
+                                    </code>
+                                </td>
+
+                                <!-- Trang đã xem -->
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                        <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8; font-size: 0.7rem; padding: 0.2rem 0.4rem;">
+                                            {{ v.method }}
+                                        </span>
+                                        <span style="font-family: monospace; font-size: 0.85rem; color: #e2e8f0; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ v.path }}">
+                                            {{ v.path }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Thiết bị -->
+                                <td style="font-size: 0.85rem; color: var(--text-muted);" title="{{ v.user_agent }}">
+                                    {{ dev.display }}
+                                </td>
+
+                                <!-- Status -->
+                                <td style="text-align: center;">
+                                    {% if v.status_code >= 200 and v.status_code < 300 %}
+                                        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.75rem;">{{ v.status_code }}</span>
+                                    {% elif v.status_code >= 300 and v.status_code < 400 %}
+                                        <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; font-size: 0.75rem;">{{ v.status_code }}</span>
+                                    {% else %}
+                                        <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 0.75rem;">{{ v.status_code }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                Chưa có dữ liệu nhật ký truy cập nào được ghi nhận.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- KHỐI 2: ĐƠN HÀNG GẦN ĐÂY -->
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">📑 Đơn Hàng Mới Nhất</h2>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Số tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in recent_orders %}
+                        <tr>
+                            <td><strong>{{ o.order_code }}</strong></td>
+                            <td>{{ o.customer_name }}</td>
+                            <td style="color: #34d399; font-weight: 700;">{{ "{:,.0f}".format(o.total_amount) }} đ</td>
+                            <td>
+                                <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">{{ o.status }}</span>
+                            </td>
+                            <td style="font-size: 0.85rem; color: var(--text-dim);">{{ o.created_at }}</td>
+                            <td>
+                                <a href="{{ url_for('cart.order_detail', order_id=o.id) }}" class="btn btn-secondary btn-sm">Xem →</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

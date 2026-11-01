@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 290 64" fill="none">
+  <!-- Circular 52H Badge Icon -->
+  <circle cx="32" cy="32" r="28" fill="#ffffff" stroke="#e11b22" stroke-width="2.5"/>
+  <circle cx="32" cy="32" r="23" fill="#ffffff"/>
+  <!-- 52H Emblem inside circle -->
+  <text x="32" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="900" fill="#1967d2" text-anchor="middle" letter-spacing="-0.5">52<tspan fill="#e11b22">H</tspan></text>
+  
+  <!-- Text Laptop52h.vn -->
+  <text x="68" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="25" font-weight="900" fill="#1a202c" letter-spacing="-0.5">Laptop<tspan fill="#e11b22">52h</tspan><tspan fill="#1967d2" font-size="19" font-weight="700">.vn</tspan></text>
+  <text x="70" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="600" fill="#64748b" letter-spacing="1.5">CHUYÊN GIA LAPTOP GAMING</text>
+</svg>

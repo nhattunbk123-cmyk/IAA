@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Lỗi Nội Bộ Máy Chủ - VulnShop{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 5rem 1rem;">
+    <div style="font-size: 5rem; margin-bottom: 1rem;">⚠️</div>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: #f59e0b; margin-bottom: 0.75rem;">
+        500 - Lỗi Nội Bộ Máy Chủ (Internal Server Error)
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2rem auto;">
+        Đã có sự cố kỹ thuật xảy ra trong quá trình xử lý yêu cầu. Trong chế độ an toàn (Fixed), mọi thông tin chi tiết về mã nguồn và traceback đã được ẩn đi để đảm bảo an ninh mạng.
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 1rem;">
+        <a href="{{ url_for('main.index') }}" class="btn btn-primary">Trang chủ</a>
+        <a href="{{ url_for('lab.index') }}" class="btn btn-secondary">Trung tâm Lab</a>
+    </div>
+</div>
+{% endblock %}

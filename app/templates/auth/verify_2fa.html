@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Xác thực Google Authenticator - Laptop52h.vn{% endblock %}
+
+{% block content %}
+<div style="min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 2.5rem 1rem;">
+    <div class="auth-modal-box" style="transform: none; position: static; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); max-width: 440px; width: 100%; text-align: center;">
+        
+        <!-- Header Icon -->
+        <div style="margin-bottom: 1.25rem;">
+            <div style="width: 72px; height: 72px; background: rgba(59, 130, 246, 0.12); border: 2px solid #3b82f6; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2.2rem; margin-bottom: 0.75rem; box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);">
+                🔐
+            </div>
+            <h1 class="auth-modal-title" style="font-size: 1.45rem; font-weight: 800; margin-bottom: 0.35rem;">Xác Thực Đăng Nhập 2 Lớp</h1>
+            <p class="auth-modal-subtitle" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.4;">
+                Đăng nhập tài khoản: <strong style="color: #60a5fa;">{{ username }}</strong>
+            </p>
+        </div>
+
+        <!-- Hướng dẫn ngắn -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1.5rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+            📱 Mở ứng dụng <strong>Google Authenticator</strong> trên điện thoại và nhập mã 6 số cho <strong>Laptop52h ({{ username }})</strong>.
+        </div>
+
+        <!-- Form nhập mã 6 số -->
+        <form method="POST">
+            <div class="auth-input-group" style="margin-bottom: 1.25rem;">
+                <label class="form-label" style="display: block; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.6rem; color: #f1f5f9;">
+                    Nhập mã xác thực 6 chữ số:
+                </label>
+                <input type="text" name="code" id="auth-code-input" class="auth-input-control" placeholder="••••••" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" required autofocus style="text-align: center; font-size: 1.8rem; letter-spacing: 8px; font-weight: 800; padding: 0.75rem 1rem; border-color: #3b82f6; background: rgba(15, 23, 42, 0.8);">
+                <div style="margin-top: 0.5rem; font-size: 0.76rem; color: var(--text-muted);">
+                    ⏱️ Mã đổi mới tự động sau mỗi 30 giây
+                </div>
+            </div>
+
+            <button type="submit" id="btn-verify-submit" class="btn-auth-submit" style="font-size: 1rem; padding: 0.75rem 1.5rem; font-weight: 700;">
+                🛡️ Xác Thực & Đăng Nhập
+            </button>
+        </form>
+
+        <!-- Quay lại -->
+        <div style="margin-top: 1.5rem; font-size: 0.85rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <a href="{{ url_for('auth.login') }}" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                ← Đăng nhập bằng tài khoản khác
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tự động submit khi người dùng nhập đủ 6 chữ số
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('auth-code-input');
+    const submitBtn = document.getElementById('btn-verify-submit');
+
+    if (codeInput) {
+        codeInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length === 6) {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Đang xác thực...';
+                }
+                setTimeout(() => {
+                    this.form.submit();
+                }, 200);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

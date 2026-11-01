@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Danh Mục Laptop & Sản Phẩm - Laptop52h.vn{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar" style="margin-top: 1rem;">
+    <a href="{{ url_for('main.index') }}">Trang chủ</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">{{ current_category or 'TẤT CẢ LAPTOP' }}</span>
+</div>
+
+<div style="margin-bottom: 3rem;">
+    <div class="products-header-bar" style="margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="products-category-title" style="font-size: 1.5rem;">
+                {{ current_category or 'TẤT CẢ LAPTOP GAMING' }}
+            </h1>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.25rem;">
+                Tổng hợp các dòng laptop cao cấp, hiệu năng đỉnh cao, bảo hành siêu tốc tại Laptop52h.vn
+            </p>
+        </div>
+
+        <div>
+            <a href="{{ url_for('main.filter_products') }}" class="btn btn-secondary btn-sm">
+                🔍 Bộ Lọc Nâng Cao & SQL Injection
+            </a>
+        </div>
+    </div>
+
+    <!-- Danh mục phân loại -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <a href="{{ url_for('main.product_list') }}" class="btn {{ 'btn-primary' if not current_category else 'btn-secondary' }} btn-sm" style="border-radius: 20px;">
+            Tất cả
+        </a>
+        {% for cat in categories %}
+            <a href="{{ url_for('main.product_list', category=cat) }}" class="btn {{ 'btn-primary' if current_category == cat else 'btn-secondary' }} btn-sm" style="border-radius: 20px;">
+                {{ cat }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Grid sản phẩm -->
+    <div class="product-grid">
+        {% for product in products %}
+            <article class="product-card" id="card-product-{{ product.id }}">
+                <div class="product-card-badges">
+                    {% if product.id in [1, 2, 4, 6, 7] %}
+                        <span class="badge-new">★ Mới</span>
+                    {% endif %}
+                    {% if product.id in [1, 3, 5, 8] %}
+                        <span class="badge-bestseller">🔥 Bán chạy</span>
+                    {% endif %}
+                </div>
+
+                <div class="product-card-img-wrap">
+                    <a href="{{ url_for('product.detail', product_id=product.id) }}">
+                        <img src="{{ product.image_url or url_for('static', filename='images/laptop_acer_v15.svg') }}" alt="{{ product.name }}" id="img-product-{{ product.id }}" loading="lazy">
+                    </a>
+                </div>
+
+                <div class="product-card-body">
+                    <h3 class="product-card-title">
+                        <a href="{{ url_for('product.detail', product_id=product.id) }}" id="title-product-{{ product.id }}">
+                            {{ product.name }}
+                        </a>
+                    </h3>
+
+                    <div class="product-card-price-row">
+                        <span class="product-card-current-price" id="price-product-{{ product.id }}">
+                            {{ "{:,.0f}".format(product.price) }} đ
+                        </span>
+
+                        {% if product.original_price and product.original_price > product.price %}
+                            {% set discount_pct = (((product.original_price - product.price) / product.original_price) * 100)|round|int %}
+                            <span class="product-card-discount-tag" id="discount-product-{{ product.id }}">
+                                -{{ discount_pct }}%
+                            </span>
+                            <div class="product-card-old-price" id="old-price-product-{{ product.id }}">
+                                {{ "{:,.0f}".format(product.original_price) }} đ
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                        <form action="{{ url_for('cart.add_to_cart') }}" method="POST" style="flex: 1; margin: 0;">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; border-radius: 4px;">
+                                🛒 Mua Ngay
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- ADMIN CONTROLS TRÊN CARD -->
+                    {% if current_user.role == 'admin' %}
+                        <div class="product-card-admin-bar">
+                            <button type="button" class="btn-admin-action" onclick="openAdminPriceModal('{{ product.id }}', '{{ product.name }}', '{{ product.price }}', '{{ product.original_price or product.price }}')">
+                                ✏️ Sửa giá
+                            </button>
+                            <button type="button" class="btn-admin-action" onclick="openAdminImageModal('{{ product.id }}', '{{ product.name }}', '{{ product.image_url }}')">
+                                🖼️ Đổi ảnh
+                            </button>
+                            <form action="{{ url_for('admin.delete_product', product_id=product.id) }}" method="POST" style="margin: 0; display: inline;" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                                <button type="submit" class="btn-admin-action btn-admin-delete">
+                                    🗑️
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

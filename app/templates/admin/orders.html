@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Quản Lý Đơn Hàng (Broken Access Control Lab) - VulnShop Admin{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">📑 Toàn Bộ Đơn Hàng Hệ Thống</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Quản trị trạng thái và theo dõi đơn hàng của toàn bộ khách hàng</p>
+        </div>
+
+        <div>
+            <a href="{{ url_for('lab.detail', lab_id='broken_access_control') }}" class="btn btn-secondary btn-sm">
+                🔬 Xem tài liệu Broken Access Control →
+            </a>
+        </div>
+    </div>
+
+    <!-- KHUNG THỬ NGHIỆM LAB: BROKEN ACCESS CONTROL API -->
+    <div style="background: rgba(31, 41, 55, 0.7); border: 1px dashed var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            🔬 Kiểm Thử API Phân Quyền Quản Trị (Broken Access Control):
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            Endpoint: <code>POST /api/admin/orders/&lt;order_id&gt;/status</code>.<br>
+            - Ở chế độ <strong>Vulnerable</strong>: Bất kỳ ai đăng nhập (kể cả khách hàng bình thường như <code>user1</code>) đều có thể gửi request để đổi trạng thái đơn hàng bất kỳ sang "Đã hoàn thành".<br>
+            - Ở chế độ <strong>Fixed</strong>: Server kiểm tra thuộc tính vai trò <code>session['role'] == 'admin'</code>, từ chối người dùng thường với mã <code>403 Forbidden</code>.
+        </p>
+
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <input type="number" id="bac-order-id" value="1" min="1" class="form-control" style="width: 120px;" placeholder="Order ID">
+            <select id="bac-new-status" class="form-control" style="width: 180px;">
+                <option value="Đã hoàn thành">Đã hoàn thành</option>
+                <option value="Đang giao hàng">Đang giao hàng</option>
+                <option value="Đã hủy">Đã hủy</option>
+            </select>
+            <button type="button" id="btn-test-bac" class="btn btn-primary btn-sm">
+                ⚡ Gửi Request Thử Nghiệm API
+            </button>
+        </div>
+        <div id="bac-result-box" style="display: none; margin-top: 1rem; padding: 0.75rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.85rem;"></div>
+    </div>
+
+    <!-- Bảng danh sách đơn hàng -->
+    <div class="table-responsive" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Địa chỉ nhận</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                    <tr>
+                        <td>
+                            <strong style="color: #93c5fd;">{{ o.order_code }}</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-dim); display: block;">ID: {{ o.id }}</span>
+                        </td>
+                        <td>
+                            <strong style="color: #fff;">{{ o.full_name }}</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-dim); display: block;">@{{ o.username }}</span>
+                        </td>
+                        <td style="font-size: 0.85rem; max-width: 250px;">{{ o.shipping_address }}</td>
+                        <td style="color: #34d399; font-weight: 700;">{{ "{:,.0f}".format(o.total_amount) }} đ</td>
+                        <td>
+                            <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid #3b82f6;">
+                                {{ o.status }}
+                            </span>
+                        </td>
+                        <td style="font-size: 0.8rem; color: var(--text-dim);">{{ o.created_at }}</td>
+                        <td>
+                            <a href="{{ url_for('cart.order_detail', order_id=o.id) }}" class="btn btn-secondary btn-sm">Xem →</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('btn-test-bac')?.addEventListener('click', async function() {
+    const orderId = document.getElementById('bac-order-id').value;
+    const newStatus = document.getElementById('bac-new-status').value;
+    const resultBox = document.getElementById('bac-result-box');
+    
+    resultBox.style.display = 'block';
+    resultBox.style.background = '#0d1117';
+    resultBox.style.color = '#fff';
+    resultBox.textContent = 'Đang gửi yêu cầu POST...';
+
+    try {
+        const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        
+        if (res.status === 200) {
+            resultBox.style.border = '1px solid #10b981';
+            resultBox.style.color = '#34d399';
+            resultBox.textContent = `[HTTP 200 OK] Thành công!\nThông báo: ${data.message}\nThực hiện bởi: ${data.executed_by} (Vai trò: ${data.user_role})\nChế độ Vulnerable: ${data.is_vuln}`;
+        } else if (res.status === 403) {
+            resultBox.style.border = '1px solid #ef4444';
+            resultBox.style.color = '#f87171';
+            resultBox.textContent = `[HTTP 403 Forbidden] BỊ CHẶN BỞI HỆ THỐNG PHÒNG THỦ!\nThông báo: ${data.message}\nChế độ Vulnerable: ${data.is_vuln}`;
+        } else {
+            resultBox.textContent = `[HTTP ${res.status}] ${data.message || 'Lỗi không xác định'}`;
+        }
+    } catch(err) {
+        resultBox.textContent = 'Lỗi mạng: ' + err.message;
+    }
+});
+</script>
+{% endblock %}

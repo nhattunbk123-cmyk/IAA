@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Quản Lý Sản Phẩm - VulnShop Admin{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">📦 Quản Lý Sản Phẩm</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Danh mục sản phẩm hiện có trong cơ sở dữ liệu</p>
+        </div>
+
+        <a href="{{ url_for('admin.add_product') }}" class="btn btn-primary">
+            ➕ Thêm Sản Phẩm Mới
+        </a>
+    </div>
+
+    <div class="table-responsive" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">ID</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th>Giá bán</th>
+                    <th>Kho</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                    <tr>
+                        <td style="color: var(--text-dim);">#{{ p.id }}</td>
+                        <td>
+                            <strong style="color: #fff;">{{ p.name }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge" style="background: rgba(255,255,255,0.06); color: #93c5fd;">{{ p.category }}</span>
+                        </td>
+                        <td style="color: #34d399; font-weight: 700;">{{ "{:,.0f}".format(p.price) }} đ</td>
+                        <td>{{ p.stock }}</td>
+                        <td style="display: flex; gap: 0.5rem;">
+                            <a href="{{ url_for('admin.edit_product', product_id=p.id) }}" class="btn btn-secondary btn-sm">Sửa</a>
+                            <form action="{{ url_for('admin.delete_product', product_id=p.id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');" style="margin: 0;">
+                                <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

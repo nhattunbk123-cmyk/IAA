@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Thêm Sản Phẩm Mới' if action == 'add' else 'Chỉnh Sửa Sản Phẩm' }} - VulnShop Admin{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width: 650px;">
+    <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+        <h1 style="font-size: 1.5rem; font-weight: 800; color: #fff;">
+            {{ '➕ Thêm Sản Phẩm Mới' if action == 'add' else '✏️ Chỉnh Sửa Thông Tin Sản Phẩm' }}
+        </h1>
+    </div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label class="form-label">Tên sản phẩm:</label>
+            <input type="text" name="name" value="{{ product.name if product else '' }}" class="form-control" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label class="form-label">Giá bán (VND):</label>
+                <input type="number" name="price" value="{{ product.price if product else 100000 }}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Giá gốc (VND):</label>
+                <input type="number" name="original_price" value="{{ product.original_price if product else 120000 }}" class="form-control">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label class="form-label">Danh mục:</label>
+                <input type="text" name="category" value="{{ product.category if product else 'Phụ kiện' }}" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Số lượng trong kho:</label>
+                <input type="number" name="stock" value="{{ product.stock if product else 50 }}" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Mô tả sản phẩm:</label>
+            <textarea name="description" rows="4" class="form-control">{{ product.description if product else '' }}</textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+            <a href="{{ url_for('admin.products') }}" class="btn btn-secondary">Hủy bỏ</a>
+            <button type="submit" class="btn btn-primary">
+                {{ 'Thêm Sản Phẩm' if action == 'add' else 'Cập Nhật' }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

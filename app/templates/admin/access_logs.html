@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Nhật Ký Truy Cập Web (Ai vào web & Thời gian) - Laptop52h Admin{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <!-- TIÊU ĐỀ & NÚT THAO TÁC NHANH -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="font-size: 1.85rem;">🕒</span>
+                <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff; margin: 0;">Nhật Ký Truy Cập Website</h1>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                Theo dõi chi tiết <strong>thời gian</strong> và <strong>ai đang vào web</strong> (Admin, Khách hàng, Khách vãng lai) theo thời gian thực.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+            <a href="{{ url_for('admin.access_logs') }}" class="btn btn-secondary btn-sm" title="Tải lại trang để lấy dữ liệu mới nhất">
+                🔄 Làm mới
+            </a>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm">
+                ⚡ Về Dashboard
+            </a>
+            <button type="button" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4);" onclick="document.getElementById('modal-clear-logs').style.display='flex'">
+                🗑️ Dọn dẹp nhật ký
+            </button>
+        </div>
+    </div>
+
+    <!-- 4 THẺ THỐNG KÊ NHANH -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Tổng Lượt Truy Cập</span>
+            <div style="font-size: 1.75rem; font-weight: 800; color: #c084fc; margin-top: 0.35rem;">
+                {{ total_visits }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">lượt</span>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid rgba(14, 165, 233, 0.4); border-radius: var(--radius-lg); padding: 1.25rem;">
+            <span style="font-size: 0.85rem; color: #7dd3fc; text-transform: uppercase; font-weight: 600;">Hôm Nay</span>
+            <div style="font-size: 1.75rem; font-weight: 800; color: #38bdf8; margin-top: 0.35rem;">
+                {{ today_visits }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">lượt</span>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Thành Viên Đăng Nhập</span>
+            <div style="font-size: 1.75rem; font-weight: 800; color: #34d399; margin-top: 0.35rem;">
+                {{ user_visits }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">lượt</span>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Khách Vãng Lai</span>
+            <div style="font-size: 1.75rem; font-weight: 800; color: #fbbf24; margin-top: 0.35rem;">
+                {{ guest_visits }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">lượt</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BỘ LỌC VÀ TÌM KIẾM -->
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem;">
+        <form method="GET" action="{{ url_for('admin.access_logs') }}" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+            <!-- Bộ lọc vai trò -->
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Lọc theo:</span>
+                <a href="{{ url_for('admin.access_logs', role='all', q=search_q) }}" 
+                   class="badge" 
+                   style="padding: 0.45rem 0.8rem; text-decoration: none; font-size: 0.8rem; cursor: pointer; {% if role_filter == 'all' %}background: #2563eb; color: #fff;{% else %}background: rgba(255,255,255,0.06); color: var(--text-muted);{% endif %}">
+                    Tất cả
+                </a>
+                <a href="{{ url_for('admin.access_logs', role='member', q=search_q) }}" 
+                   class="badge" 
+                   style="padding: 0.45rem 0.8rem; text-decoration: none; font-size: 0.8rem; cursor: pointer; {% if role_filter == 'member' %}background: #10b981; color: #fff;{% else %}background: rgba(255,255,255,0.06); color: var(--text-muted);{% endif %}">
+                    👤 Thành viên đã đăng nhập
+                </a>
+                <a href="{{ url_for('admin.access_logs', role='admin', q=search_q) }}" 
+                   class="badge" 
+                   style="padding: 0.45rem 0.8rem; text-decoration: none; font-size: 0.8rem; cursor: pointer; {% if role_filter == 'admin' %}background: #f59e0b; color: #000; font-weight: 700;{% else %}background: rgba(255,255,255,0.06); color: var(--text-muted);{% endif %}">
+                    👑 Quản trị viên (Admin)
+                </a>
+                <a href="{{ url_for('admin.access_logs', role='user', q=search_q) }}" 
+                   class="badge" 
+                   style="padding: 0.45rem 0.8rem; text-decoration: none; font-size: 0.8rem; cursor: pointer; {% if role_filter == 'user' %}background: #0ea5e9; color: #fff;{% else %}background: rgba(255,255,255,0.06); color: var(--text-muted);{% endif %}">
+                    🛍️ Khách hàng
+                </a>
+                <a href="{{ url_for('admin.access_logs', role='guest', q=search_q) }}" 
+                   class="badge" 
+                   style="padding: 0.45rem 0.8rem; text-decoration: none; font-size: 0.8rem; cursor: pointer; {% if role_filter == 'guest' %}background: #64748b; color: #fff;{% else %}background: rgba(255,255,255,0.06); color: var(--text-muted);{% endif %}">
+                    🌐 Khách vãng lai
+                </a>
+            </div>
+
+            <!-- Ô tìm kiếm -->
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex: 1; max-width: 420px; min-width: 260px;">
+                <input type="hidden" name="role" value="{{ role_filter }}">
+                <input type="text" 
+                       name="q" 
+                       value="{{ search_q }}" 
+                       placeholder="Tìm username, họ tên, IP, đường dẫn..." 
+                       class="form-control" 
+                       style="padding: 0.45rem 0.85rem; font-size: 0.85rem; width: 100%; background: #0f172a; border: 1px solid var(--border-color); color: #fff; border-radius: var(--radius-md);">
+                <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.45rem 0.85rem;">
+                    🔍 Tìm
+                </button>
+                {% if search_q or role_filter != 'all' %}
+                    <a href="{{ url_for('admin.access_logs') }}" class="btn btn-secondary btn-sm" title="Xóa bộ lọc" style="color: #f87171;">
+                        ✕
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- BẢNG DANH SÁCH NHẬT KÝ CHI TIẾT -->
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1.5rem;">
+        <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="font-size: 0.9rem; color: var(--text-muted);">
+                Kết quả phù hợp: <strong style="color: #fff;">{{ filtered_count }}</strong> lượt truy cập
+            </span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">
+                Trang <strong style="color: #38bdf8;">{{ current_page }}</strong> / {{ total_pages }}
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#ID</th>
+                        <th style="min-width: 170px;">Thời Gian Truy Cập</th>
+                        <th style="min-width: 200px;">Ai Vào Web (Danh tính)</th>
+                        <th style="min-width: 130px;">Địa Chỉ IP</th>
+                        <th>Trang Đã Vào</th>
+                        <th style="min-width: 170px;">Thiết Bị / Trình Duyệt</th>
+                        <th style="text-align: center; width: 80px;">HTTP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs %}
+                        {% for log in logs %}
+                            {% set dev = log.user_agent | parse_device %}
+                            <tr>
+                                <!-- ID -->
+                                <td style="color: var(--text-dim); font-size: 0.8rem;">
+                                    #{{ log.id }}
+                                </td>
+
+                                <!-- THỜI GIAN -->
+                                <td style="white-space: nowrap;">
+                                    <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                        <span style="color: #38bdf8; font-size: 0.9rem;">🕒</span>
+                                        <strong style="color: #f8fafc; font-size: 0.85rem; font-family: monospace;">{{ log.created_at }}</strong>
+                                    </div>
+                                </td>
+
+                                <!-- AI VÀO WEB -->
+                                <td>
+                                    {% if log.role == 'admin' %}
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; font-size: 0.72rem; padding: 0.2rem 0.5rem;">
+                                                👑 Admin
+                                            </span>
+                                            <div>
+                                                <div style="font-weight: 700; color: #fff; font-size: 0.9rem;">{{ log.full_name }}</div>
+                                                <small style="color: #93c5fd; font-family: monospace;">@{{ log.username }}</small>
+                                            </div>
+                                        </div>
+                                    {% elif log.role == 'user' %}
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; font-size: 0.72rem; padding: 0.2rem 0.5rem;">
+                                                👤 Khách hàng
+                                            </span>
+                                            <div>
+                                                <div style="font-weight: 700; color: #fff; font-size: 0.9rem;">{{ log.full_name }}</div>
+                                                <small style="color: #93c5fd; font-family: monospace;">@{{ log.username }}</small>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span class="badge" style="background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid #64748b; font-size: 0.72rem; padding: 0.2rem 0.5rem;">
+                                                🌐 Khách vãng lai
+                                            </span>
+                                            <span style="color: var(--text-muted); font-size: 0.85rem;">Chưa đăng nhập</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- ĐỊA CHỈ IP -->
+                                <td>
+                                    <code style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.08); padding: 0.25rem 0.5rem; border-radius: 4px; color: #a5f3fc; font-size: 0.8rem; font-weight: 600;">
+                                        {{ log.ip_address }}
+                                    </code>
+                                </td>
+
+                                <!-- TRANG ĐÃ VÀO -->
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; max-width: 320px;">
+                                        <span class="badge" style="background: {% if log.method == 'POST' %}rgba(245, 158, 11, 0.2){% else %}rgba(59, 130, 246, 0.2){% endif %}; color: {% if log.method == 'POST' %}#fbbf24{% else %}#60a5fa{% endif %}; font-size: 0.7rem; padding: 0.15rem 0.4rem; font-weight: 700;">
+                                            {{ log.method }}
+                                        </span>
+                                        <span style="font-family: monospace; font-size: 0.85rem; color: #f1f5f9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ log.path }}">
+                                            {% if log.method == 'GET' and not log.path.startswith('/admin') %}
+                                                <a href="{{ log.path }}" target="_blank" style="color: #cbd5e1; text-decoration: none;" onmouseover="this.style.color='#38bdf8'" onmouseout="this.style.color='#cbd5e1'">
+                                                    {{ log.path }} ↗
+                                                </a>
+                                            {% else %}
+                                                {{ log.path }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- THIẾT BỊ / TRÌNH DUYỆT -->
+                                <td>
+                                    <div style="font-size: 0.85rem; color: #e2e8f0; cursor: help;" title="{{ log.user_agent }}">
+                                        {{ dev.display }}
+                                    </div>
+                                </td>
+
+                                <!-- MÃ TRẠNG THÁI HTTP -->
+                                <td style="text-align: center;">
+                                    {% if log.status_code >= 200 and log.status_code < 300 %}
+                                        <span class="badge" style="background: rgba(16, 185, 129, 0.18); color: #34d399; font-weight: 700; font-size: 0.75rem;">
+                                            {{ log.status_code }}
+                                        </span>
+                                    {% elif log.status_code >= 300 and log.status_code < 400 %}
+                                        <span class="badge" style="background: rgba(245, 158, 11, 0.18); color: #fbbf24; font-weight: 700; font-size: 0.75rem;">
+                                            {{ log.status_code }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge" style="background: rgba(239, 68, 68, 0.18); color: #f87171; font-weight: 700; font-size: 0.75rem;">
+                                            {{ log.status_code }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                                <div style="font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.5;">🔍</div>
+                                <div style="font-size: 1.1rem; font-weight: 600; color: #fff;">Không tìm thấy bản ghi truy cập nào</div>
+                                <p style="font-size: 0.85rem; margin-top: 0.25rem;">Thử đổi từ khóa tìm kiếm hoặc bỏ chọn bộ lọc để xem toàn bộ danh sách.</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PHÂN TRANG -->
+        {% if total_pages > 1 %}
+            <div style="padding: 1rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: center; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                {% if current_page > 1 %}
+                    <a href="{{ url_for('admin.access_logs', page=current_page-1, role=role_filter, q=search_q) }}" class="btn btn-secondary btn-sm">
+                        ← Trang trước
+                    </a>
+                {% endif %}
+
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == current_page %}
+                        <span class="btn btn-primary btn-sm" style="font-weight: 700; min-width: 36px; text-align: center;">{{ p }}</span>
+                    {% elif p == 1 or p == total_pages or (p >= current_page - 2 and p <= current_page + 2) %}
+                        <a href="{{ url_for('admin.access_logs', page=p, role=role_filter, q=search_q) }}" class="btn btn-secondary btn-sm" style="min-width: 36px; text-align: center;">
+                            {{ p }}
+                        </a>
+                    {% elif p == current_page - 3 or p == current_page + 3 %}
+                        <span style="color: var(--text-dim); padding: 0 0.25rem;">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if current_page < total_pages %}
+                    <a href="{{ url_for('admin.access_logs', page=current_page+1, role=role_filter, q=search_q) }}" class="btn btn-secondary btn-sm">
+                        Trang sau →
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- MODAL XÁC NHẬN DỌN DẸP NHẬT KÝ -->
+<div id="modal-clear-logs" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); max-width: 440px; width: 100%; padding: 1.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);">
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>⚠️</span> Dọn Dẹp Nhật Ký Truy Cập
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+            Bạn có thể chọn dọn dẹp các bản ghi cũ hơn 7 ngày để tối ưu dung lượng, hoặc xóa trắng toàn bộ dữ liệu nhật ký hiện tại.
+        </p>
+
+        <form method="POST" action="{{ url_for('admin.clear_access_logs') }}" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <button type="submit" name="action" value="older_7days" class="btn btn-secondary" style="width: 100%; text-align: left; padding: 0.75rem 1rem;">
+                🧹 Xóa bản ghi cũ hơn 7 ngày
+            </button>
+
+            <button type="submit" name="action" value="all" class="btn" style="background: #ef4444; color: #fff; width: 100%; text-align: left; padding: 0.75rem 1rem; border: none; font-weight: 600;" onclick="return confirm('Bạn có chắc chắn muốn xóa TOÀN BỘ dữ liệu nhật ký truy cập không?');">
+                🗑️ Xóa trắng toàn bộ nhật ký
+            </button>
+
+            <button type="button" class="btn btn-secondary" style="margin-top: 0.5rem;" onclick="document.getElementById('modal-clear-logs').style.display='none'">
+                Hủy bỏ
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

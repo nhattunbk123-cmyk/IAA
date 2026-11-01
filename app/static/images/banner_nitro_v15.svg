@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0c13"/>
+      <stop offset="40%" stop-color="#141926"/>
+      <stop offset="70%" stop-color="#1c1110"/>
+      <stop offset="100%" stop-color="#090a0f"/>
+    </linearGradient>
+    <linearGradient id="neonOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff3b00"/>
+      <stop offset="50%" stop-color="#ff7a00"/>
+      <stop offset="100%" stop-color="#ff0044"/>
+    </linearGradient>
+    <linearGradient id="nitroText" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#fcd34d"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="480" rx="12" fill="url(#bgGrad)"/>
+
+  <!-- Cyber grid lines -->
+  <path d="M0 80 H1000 M0 160 H1000 M0 240 H1000 M0 320 H1000 M0 400 H1000" stroke="#ff4500" stroke-opacity="0.07" stroke-width="1"/>
+  <path d="M150 0 V480 M300 0 V480 M450 0 V480 M600 0 V480 M750 0 V480 M900 0 V480" stroke="#ff4500" stroke-opacity="0.07" stroke-width="1"/>
+
+  <!-- Orange Neon Frame Lines -->
+  <polygon points="120,50 880,50 930,100 930,420 870,445 130,445 70,390 70,100" fill="none" stroke="#ff5500" stroke-width="2" opacity="0.4" filter="url(#glow)"/>
+  <polygon points="135,65 865,65 915,115 915,405 855,430 145,430 85,375 85,115" fill="none" stroke="#ff3300" stroke-width="1" opacity="0.25"/>
+
+  <!-- Side Logo ACER -->
+  <text x="35" y="240" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="900" fill="#f97316" letter-spacing="8" transform="rotate(-90 35 240)" opacity="0.7">ACER</text>
+
+  <!-- Big Title: Nitro V 15 -->
+  <text x="500" y="115" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="76" font-weight="900" fill="url(#nitroText)" letter-spacing="2" filter="url(#glow)">Nitro V 15</text>
+  
+  <!-- Subtitle: ANV15-51 -->
+  <rect x="390" y="132" width="220" height="32" rx="4" fill="#000" stroke="#ff5500" stroke-width="1.5"/>
+  <text x="500" y="154" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="19" font-weight="800" fill="#ff7a00" letter-spacing="4">ANV15-51</text>
+
+  <!-- Left Angled Laptop -->
+  <g transform="translate(170, 180) scale(0.65)">
+    <polygon points="0,70 180,0 200,240 20,310" fill="#1e2230" stroke="#333a4d" stroke-width="2"/>
+    <polygon points="10,80 170,15 188,230 28,295" fill="#0c0e14"/>
+    <path d="M40,120 L150,70 L140,200 L50,230 Z" fill="#ff4500" opacity="0.6" filter="url(#glow)"/>
+    <polygon points="20,310 200,240 260,270 80,340" fill="#151722" stroke="#252b3b" stroke-width="2"/>
+  </g>
+
+  <!-- Right Angled Laptop (Back view with gaming vents) -->
+  <g transform="translate(620, 175) scale(0.68)">
+    <polygon points="20,0 200,60 180,300 0,240" fill="#1e2230" stroke="#333a4d" stroke-width="2"/>
+    <polygon points="20,0 200,60 180,300 0,240" fill="#141724"/>
+    <!-- Cyber Neon Nitro Logo on Lid -->
+    <path d="M60,110 L100,70 L140,110 L100,190 Z" fill="none" stroke="#ff3700" stroke-width="6" filter="url(#glow)"/>
+    <path d="M75,125 L100,95 L125,125 L100,165 Z" fill="#ff5500"/>
+    <polygon points="0,240 180,300 240,265 60,205" fill="#0f1118"/>
+  </g>
+
+  <!-- Main Center Laptop (Front View) -->
+  <g transform="translate(330, 160)">
+    <!-- Screen Outer Frame -->
+    <rect x="0" y="0" width="340" height="210" rx="8" fill="#11131a" stroke="#272d3f" stroke-width="2"/>
+    <!-- Screen Inner Display -->
+    <rect x="12" y="10" width="316" height="186" rx="4" fill="#050608"/>
+    
+    <!-- Gaming Wallpaper Graphics on Screen -->
+    <radialGradient id="screenGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff3700" stop-opacity="0.8"/>
+      <stop offset="60%" stop-color="#991100" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.95"/>
+    </radialGradient>
+    <rect x="12" y="10" width="316" height="186" rx="4" fill="url(#screenGrad)"/>
+    <!-- Glowing Nitro Symbol on Screen -->
+    <path d="M170,55 L215,100 L170,145 L125,100 Z" fill="none" stroke="#ff2200" stroke-width="5" filter="url(#glow)"/>
+    <path d="M170,72 L198,100 L170,128 L142,100 Z" fill="#ff5500"/>
+    <text x="170" y="170" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="900" fill="#ffffff" letter-spacing="3">NITRO GAMING</text>
+
+    <!-- Laptop Base (Keyboard Deck) -->
+    <polygon points="-35,210 375,210 395,260 -55,260" fill="#191c26" stroke="#272d3f" stroke-width="2"/>
+    <!-- RGB Keyboard Area -->
+    <polygon points="-15,215 355,215 370,245 -30,245" fill="#0c0e14" stroke="#ff3700" stroke-width="1" stroke-opacity="0.5"/>
+    <line x1="-10" y1="230" x2="350" y2="230" stroke="#ff7700" stroke-width="2" stroke-opacity="0.8" filter="url(#glow)"/>
+    <!-- Trackpad -->
+    <rect x="135" y="247" width="70" height="10" rx="2" fill="#131620" stroke="#333a4d" stroke-width="1"/>
+  </g>
+
+  <!-- Left Feature Badges -->
+  <g transform="translate(95, 335)">
+    <rect x="0" y="0" width="135" height="32" rx="4" fill="#151924" stroke="#ff5500" stroke-width="1.2"/>
+    <text x="67" y="21" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#f8fafc">Cấu hình mạnh mẽ</text>
+  </g>
+  <g transform="translate(95, 380)">
+    <rect x="0" y="0" width="135" height="32" rx="4" fill="#151924" stroke="#ff5500" stroke-width="1.2"/>
+    <text x="67" y="21" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#f8fafc">Đa nhiệm xuất sắc</text>
+  </g>
+
+  <!-- Right Feature Badges -->
+  <g transform="translate(770, 335)">
+    <rect x="0" y="0" width="135" height="32" rx="4" fill="#151924" stroke="#ff5500" stroke-width="1.2"/>
+    <text x="67" y="21" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#f8fafc">Thiết kế tinh tế</text>
+  </g>
+  <g transform="translate(770, 380)">
+    <rect x="0" y="0" width="135" height="32" rx="4" fill="#151924" stroke="#ff5500" stroke-width="1.2"/>
+    <text x="67" y="21" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#f8fafc">Hiệu năng đỉnh cao</text>
+  </g>
+
+  <!-- XEM THÊM Button -->
+  <g transform="translate(440, 422)">
+    <rect x="0" y="0" width="120" height="28" rx="14" fill="url(#neonOrange)"/>
+    <text x="60" y="19" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#ffffff" letter-spacing="1">XEM THÊM</text>
+  </g>
+
+  <!-- Carousel Indicator Dots -->
+  <circle cx="475" cy="465" r="4" fill="#ff5500"/>
+  <circle cx="492" cy="465" r="4" fill="#475569"/>
+  <circle cx="508" cy="465" r="4" fill="#475569"/>
+  <circle cx="525" cy="465" r="4" fill="#475569"/>
+</svg>

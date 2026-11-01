@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Web Shell Console - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0; max-width: 900px; margin-left: auto; margin-right: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">Interactive Web Shell Console</span>
+                <span class="badge badge-medium">File: {{ filename }}</span>
+            </div>
+            <h1 style="font-size: 1.65rem; font-weight: 800; color: #fff;">⚡ Bảng Điều Khiển Web Shell (RCE)</h1>
+        </div>
+        <div>
+            <a href="{{ url_for('tools.upload_file') }}" class="btn btn-secondary btn-sm">
+                ← Quay lại Upload Center
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert cảnh báo giáo dục -->
+    <div class="alert alert-warning" style="margin-bottom: 1.5rem;">
+        <span>⚠️ <strong>Cảnh báo thực hành Lab:</strong> Bạn đang tương tác với Web Shell được kích hoạt trên container VulnShop Lab. Các lệnh được thực thi trực tiếp với quyền tiến trình của web server.</span>
+    </div>
+
+    <!-- Command Input Box -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <form method="POST" action="{{ url_for('tools.webshell_console', filename=filename) }}">
+            <div class="form-group">
+                <label for="cmd-input" style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                    Nhập lệnh hệ thống (OS Command):
+                </label>
+                <div style="display: flex; gap: 0.75rem;">
+                    <input 
+                        type="text" 
+                        id="cmd-input" 
+                        name="cmd" 
+                        class="form-control" 
+                        value="{{ cmd }}" 
+                        placeholder="whoami, id, ls -la, uname -a..."
+                        required
+                        style="flex: 1; font-family: monospace;"
+                    >
+                    <button type="submit" class="btn btn-danger" style="white-space: nowrap;">
+                        ⚡ Thực Thi Lệnh
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="font-size: 0.85rem; color: var(--text-dim); line-height: 2;">Lệnh nhanh:</span>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="runCmd('whoami')">whoami</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="runCmd('id')">id</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="runCmd('pwd')">pwd</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="runCmd('ls -la /app')">ls -la /app</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="runCmd('uname -a')">uname -a</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="runCmd('head -n 5 /etc/passwd')">cat /etc/passwd</button>
+        </div>
+    </div>
+
+    <!-- Terminal Display Output -->
+    <div class="card" style="background: #030712; border-color: #1e293b; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></span>
+                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></span>
+                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></span>
+                <span style="font-family: monospace; font-size: 0.85rem; color: #94a3b8; margin-left: 0.5rem;">webshell@container:~$ {{ cmd }}</span>
+            </div>
+        </div>
+
+        {% if error %}
+            <div style="color: #f87171; font-family: monospace; font-size: 0.9rem; padding: 0.5rem 0;">
+                [ERROR]: {{ error }}
+            </div>
+        {% endif %}
+
+        <pre style="font-family: 'Consolas', 'Courier New', monospace; font-size: 0.9rem; color: #34d399; line-height: 1.5; white-space: pre-wrap; word-break: break-all; margin: 0; padding: 0.5rem 0; min-height: 100px;">{{ cmd_output or '(Không có dữ liệu trả về hoặc lệnh rỗng)' }}</pre>
+    </div>
+</div>
+
+<script>
+function runCmd(cmd) {
+    document.getElementById('cmd-input').value = cmd;
+    document.forms[0].submit();
+}
+</script>
+{% endblock %}

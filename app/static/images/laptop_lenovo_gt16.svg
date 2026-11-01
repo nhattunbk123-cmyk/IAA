@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 250" width="100%" height="100%">
+  <!-- Laptop Lenovo Lecoo GT16 N176DG -->
+  <defs>
+    <filter id="neonGreen" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <g transform="translate(30, 20)">
+    <!-- Outer Bezel -->
+    <rect x="0" y="0" width="260" height="165" rx="6" fill="#181a20" stroke="#333846" stroke-width="2"/>
+    <circle cx="130" cy="5" r="2" fill="#475569"/>
+    <!-- Inner Screen -->
+    <rect x="8" y="9" width="244" height="147" rx="3" fill="#040907"/>
+    
+    <!-- Neon green 'lecoo' graphics (matching image 1) -->
+    <text x="130" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="900" fill="#10b981" text-anchor="middle" letter-spacing="-1" filter="url(#neonGreen)">lecoo</text>
+    <path d="M45 95 Q130 135 215 95" fill="none" stroke="#34d399" stroke-width="2.5" filter="url(#neonGreen)"/>
+    <text x="130" y="130" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#a7f3d0" text-anchor="middle" letter-spacing="2">GT16 N176DG</text>
+
+    <!-- Hinge -->
+    <rect x="80" y="165" width="100" height="6" fill="#2d323f"/>
+  </g>
+
+  <!-- Laptop Base -->
+  <polygon points="10,190 310,190 320,225 0,225" fill="#1b1e26" stroke="#2c3240" stroke-width="1.5"/>
+  <polygon points="35,193 285,193 292,213 28,213" fill="#0f1117" stroke="#10b981" stroke-width="0.8" stroke-opacity="0.6"/>
+  <rect x="125" y="216" width="70" height="7" rx="1.5" fill="#141720" stroke="#333846" stroke-width="0.8"/>
+</svg>

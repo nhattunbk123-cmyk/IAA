@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Cài đặt Google Authenticator (2FA) - Laptop52h.vn{% endblock %}
+
+{% block content %}
+<div style="min-height: 75vh; display: flex; align-items: center; justify-content: center; padding: 2.5rem 1rem;">
+    <div class="auth-modal-box" style="transform: none; position: static; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); max-width: 520px; width: 100%; text-align: center;">
+        
+        <!-- Header -->
+        <div style="margin-bottom: 1.5rem;">
+            <div style="width: 64px; height: 64px; background: rgba(59, 130, 246, 0.15); border: 2px solid #3b82f6; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 0.75rem;">
+                🛡️
+            </div>
+            <h1 class="auth-modal-title" style="font-size: 1.45rem; font-weight: 800; margin-bottom: 0.35rem;">Xác Thực 2 Lớp (Google Authenticator)</h1>
+            <p class="auth-modal-subtitle" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.4;">
+                Bảo vệ tài khoản <strong>{{ username }}</strong> bằng mã xác thực 6 số đổi mới mỗi 30 giây trên ứng dụng điện thoại.
+            </p>
+        </div>
+
+        <!-- 3 Bước Hướng Dẫn -->
+        <div style="text-align: left; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.82rem; line-height: 1.6;">
+            <div style="font-weight: 700; color: #60a5fa; margin-bottom: 0.4rem; font-size: 0.88rem;">📋 Hướng dẫn cài đặt 3 bước:</div>
+            <div><strong>1.</strong> Mở ứng dụng <strong>Google Authenticator</strong> (hoặc Authy) trên điện thoại.</div>
+            <div><strong>2.</strong> Bấm dấu <strong>(+)</strong> rồi chọn <strong>Quét mã QR</strong> (hoặc nhập mã khóa bên dưới).</div>
+            <div><strong>3.</strong> Nhập mã 6 chữ số đang hiển thị trên ứng dụng vào ô xác thực bên dưới.</div>
+        </div>
+
+        <!-- Khung hiển thị QR Code -->
+        <div style="background: #ffffff; padding: 1rem; border-radius: 12px; display: inline-block; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); margin-bottom: 1rem;">
+            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="QR Code Google Authenticator" style="width: 190px; height: 190px; display: block; border-radius: 4px;">
+        </div>
+
+        <!-- Khóa bí mật dạng văn bản -->
+        <div style="margin-bottom: 1.5rem;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                Không quét được mã? Hãy nhập mã khóa bí mật vào ứng dụng:
+            </div>
+            <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: center; max-width: 380px; margin: 0 auto;">
+                <input type="text" id="totp-secret-key" readonly value="{{ secret }}" style="background: rgba(15, 23, 42, 0.6); border: 1px dashed #3b82f6; border-radius: 6px; padding: 0.45rem 0.75rem; color: #93c5fd; font-family: monospace; font-size: 0.88rem; font-weight: 700; text-align: center; letter-spacing: 1px; width: 100%;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="copySecretKey()" style="white-space: nowrap; padding: 0.45rem 0.75rem;">
+                    📋 Sao chép
+                </button>
+            </div>
+        </div>
+
+        <!-- Form nhập mã 6 số để kích hoạt -->
+        <form method="POST" style="margin-top: 1rem;">
+            <div class="auth-input-group" style="margin-bottom: 1rem;">
+                <label class="form-label" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                    Nhập mã xác thực 6 số từ ứng dụng:
+                </label>
+                <input type="text" name="code" id="auth-code-input" class="auth-input-control" placeholder="••••••" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" required autofocus style="text-align: center; font-size: 1.5rem; letter-spacing: 8px; font-weight: 800; padding: 0.65rem 1rem;">
+            </div>
+
+            <button type="submit" class="btn-auth-submit" style="font-size: 1rem; padding: 0.75rem 1.5rem; font-weight: 700;">
+                ✅ Kích Hoạt Bảo Mật 2 Lớp
+            </button>
+        </form>
+
+        <!-- Nút hành động phụ -->
+        <div style="margin-top: 1.25rem; font-size: 0.85rem;">
+            {% if is_registration %}
+                <a href="{{ url_for('auth.skip_2fa') }}" style="color: var(--text-muted); text-decoration: underline;">
+                    Để sau / Bỏ qua bước này và vào trang chủ →
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.profile') }}" style="color: var(--text-muted); text-decoration: underline;">
+                    ← Quay lại trang Hồ sơ
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function copySecretKey() {
+    const input = document.getElementById('totp-secret-key');
+    if (input) {
+        navigator.clipboard.writeText(input.value).then(() => {
+            if (typeof showToast === 'function') {
+                showToast('Đã sao chép mã khóa bí mật vào bộ nhớ tạm!', 'success');
+            } else {
+                alert('Đã sao chép mã khóa!');
+            }
+        }).catch(() => {
+            input.select();
+            document.execCommand('copy');
+            alert('Đã sao chép mã khóa!');
+        });
+    }
+}
+
+// Tự động submit khi người dùng nhập đủ 6 chữ số
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('auth-code-input');
+    if (codeInput) {
+        codeInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length === 6) {
+                // Tự động submit sau 200ms
+                setTimeout(() => {
+                    this.form.submit();
+                }, 200);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

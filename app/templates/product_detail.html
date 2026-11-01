@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0;">
+    <!-- Banner khuyến mãi (Tích hợp DOM-based XSS) -->
+    <div id="promo-banner" 
+         data-dom-vuln="{{ 'true' if is_dom_xss_vuln else 'false' }}"
+         style="display: none; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2)); border: 1px solid #3b82f6; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 2rem; color: #93c5fd;">
+    </div>
+
+    <!-- Thông tin chi tiết sản phẩm -->
+    <div style="display: grid; grid-template-columns: 1fr 1.25fr; gap: 2.5rem; margin-bottom: 3.5rem; background: #ffffff; padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+        <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); height: 350px; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+            {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            {% else %}
+                <div style="font-size: 7rem;">💻</div>
+            {% endif %}
+        </div>
+
+        <div>
+            <span class="badge" style="background: #eff6ff; color: var(--primary-blue); font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 4px; display: inline-block; margin-bottom: 0.75rem;">{{ product.category }}</span>
+            <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.75rem; color: var(--text-main);">{{ product.name }}</h1>
+            
+            <div style="margin-bottom: 1.5rem; display: flex; align-items: baseline; gap: 0.75rem;">
+                <span class="product-price" style="font-size: 1.85rem; font-weight: 900; color: var(--price-red);">{{ "{:,.0f}".format(product.price) }} đ</span>
+                {% if product.original_price and product.original_price > product.price %}
+                    <span class="product-original-price" style="font-size: 1.1rem; color: var(--text-dim); text-decoration: line-through;">
+                        {{ "{:,.0f}".format(product.original_price) }} đ
+                    </span>
+                    <span class="badge-bestseller" style="background: #fee2e2; color: #dc2626; font-size: 0.85rem; font-weight: 800; padding: 2px 6px;">
+                        -{{ (((product.original_price - product.price) / product.original_price) * 100)|round|int }}%
+                    </span>
+                {% endif %}
+            </div>
+
+            {% if current_user.role == 'admin' %}
+                <div style="background: #f8fafc; border: 1px dashed var(--border-color); border-radius: 6px; padding: 0.65rem 0.85rem; margin-bottom: 1.25rem; display: flex; gap: 0.5rem; align-items: center;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--gold-admin);">👑 Quản trị:</span>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="openAdminPriceModal('{{ product.id }}', '{{ product.name }}', '{{ product.price }}', '{{ product.original_price or product.price }}')">
+                        ✏️ Sửa giá
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="openAdminImageModal('{{ product.id }}', '{{ product.name }}', '{{ product.image_url }}')">
+                        🖼️ Đổi ảnh
+                    </button>
+                </div>
+            {% endif %}
+
+            <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.75rem;">
+                {{ product.description }}
+            </p>
+
+            <div style="margin-bottom: 1.5rem; font-size: 0.95rem; color: var(--text-dim);">
+                Kho hàng: <strong style="color: #34d399;">{{ product.stock }} sản phẩm có sẵn</strong>
+            </div>
+
+            <form action="{{ url_for('cart.add_to_cart') }}" method="POST" style="display: flex; gap: 1rem; align-items: center;">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <div style="width: 100px;">
+                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control" style="text-align: center;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.75rem 1.5rem;">
+                    🛒 Thêm Vào Giỏ Hàng
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Khu vực Đánh giá & Bình luận (Phục vụ Lab: Stored XSS) -->
+    <section style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="font-size: 1.4rem; font-weight: 700;">💬 Bình Luận & Đánh Giá Khách Hàng</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                    Khu vực thực hành Stored XSS: Dữ liệu được lưu trong CSDL và hiển thị cho mọi người dùng.
+                </p>
+            </div>
+            <div>
+                <a href="{{ url_for('lab.detail', lab_id='stored_xss') }}" class="btn btn-secondary btn-sm">Tài liệu Stored XSS →</a>
+            </div>
+        </div>
+
+        <!-- Form gửi bình luận mới -->
+        <form action="{{ url_for('product.add_comment', product_id=product.id) }}" method="POST" style="margin-bottom: 2.5rem; background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div class="form-group">
+                <label class="form-label">Đánh giá sao:</label>
+                <select name="rating" class="form-control" style="max-width: 160px;">
+                    <option value="5">⭐⭐⭐⭐⭐ 5 sao</option>
+                    <option value="4">⭐⭐⭐⭐ 4 sao</option>
+                    <option value="3">⭐⭐⭐ 3 sao</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Nội dung đánh giá:</label>
+                <textarea name="content" rows="3" class="form-control" placeholder="Viết cảm nhận của bạn về chất lượng sản phẩm..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">✉️ Gửi Đánh Giá</button>
+        </form>
+
+        <!-- Danh sách bình luận -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for comment in comments %}
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <strong>👤 {{ comment.author_name }}</strong>
+                        <span style="font-size: 0.85rem; color: var(--text-dim);">{{ comment.created_at }}</span>
+                    </div>
+                    <div style="color: #fbbf24; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                        {{ "⭐" * comment.rating }}
+                    </div>
+
+                    <!-- HIỂN THỊ NỘI DUNG BÌNH LUẬN THEO TRẠNG THÁI LAB -->
+                    <div class="comment-content" style="color: #e5e7eb; line-height: 1.6;">
+                        {% if is_stored_xss_vuln %}
+                            <!-- CHẾ ĐỘ CÓ LỖ HỔNG: | safe cho phép render HTML thô -->
+                            {{ comment.content | safe }}
+                        {% else %}
+                            <!-- CHẾ ĐỘ ĐÃ SỬA: Auto-escape bảo vệ an toàn -->
+                            {{ comment.content }}
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <p style="text-align: center; color: var(--text-dim); padding: 2rem;">Chưa có bình luận nào cho sản phẩm này. Hãy là người đầu tiên để lại đánh giá!</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

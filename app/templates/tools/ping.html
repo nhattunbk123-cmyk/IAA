@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}OS Command Injection Lab - VulnShop{% endblock %}
+
+{% block content %}
+<div style="margin: 2rem 0; max-width: 900px; margin-left: auto; margin-right: auto;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">Lab 10: OS Command Injection</span>
+                <span class="badge {{ 'status-badge-vuln' if is_vuln else 'status-badge-fixed' }}" id="status-badge-command_injection">
+                    {{ '🔴 Vulnerable' if is_vuln else '🟢 Fixed' }}
+                </span>
+            </div>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #fff;">🌐 Công Cụ Chẩn Đoán Kết Nối Mạng (Ping Tool)</h1>
+        </div>
+        <div>
+            <div class="switch-container">
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Trạng thái Lab:</span>
+                <label class="switch">
+                    <input type="checkbox" class="lab-toggle-checkbox" data-lab-id="command_injection" {{ 'checked' if is_vuln else '' }}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert thông báo lỗi nếu có -->
+    {% if error %}
+        <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
+            <span>⚠️ {{ error }}</span>
+        </div>
+    {% endif %}
+
+    <!-- Form Ping Tool -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: #fff;">Kiểm tra độ trễ mạng (Ping Host / IP)</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Nhập địa chỉ máy chủ nội bộ hoặc cổng thanh toán để đo lường chất lượng kết nối qua ICMP.
+        </p>
+
+        <form method="POST" action="{{ url_for('tools.ping') }}">
+            <div class="form-group">
+                <label for="target" style="font-weight: 600;">Địa chỉ IP / Hostname đích:</label>
+                <div style="display: flex; gap: 0.75rem; margin-top: 0.35rem;">
+                    <input 
+                        type="text" 
+                        id="target" 
+                        name="target" 
+                        class="form-control" 
+                        placeholder="Ví dụ: 127.0.0.1 hoặc localhost" 
+                        value="{{ target }}"
+                        required
+                        style="flex: 1;"
+                    >
+                    <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
+                        ⚡ Gửi Gói Tin Ping
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Nút điền nhanh Payload mẫu -->
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+            <span style="font-size: 0.85rem; color: var(--text-dim); display: block; margin-bottom: 0.5rem;">
+                🎯 Payload tiêm lệnh mẫu (Nhấp để thử nghiệm):
+            </span>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setPayload('127.0.0.1')">
+                    Ping chuẩn: 127.0.0.1
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setPayload('127.0.0.1; whoami')">
+                    Linux: 127.0.0.1; whoami
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setPayload('127.0.0.1; id; uname -a')">
+                    Linux: 127.0.0.1; id; uname -a
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setPayload('127.0.0.1; head -n 5 /etc/passwd')">
+                    Linux Đọc File: ; head -n 5 /etc/passwd
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setPayload('127.0.0.1 & whoami')">
+                    Windows: 127.0.0.1 & whoami
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kết quả thực thi Terminal Box -->
+    {% if output is not none or executed_command %}
+        <div class="card" style="background: #030712; border-color: #1e293b; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></span>
+                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></span>
+                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></span>
+                    <span style="font-family: monospace; font-size: 0.85rem; color: #94a3b8; margin-left: 0.5rem;">server_terminal@vulnshop:~$</span>
+                </div>
+                {% if executed_command %}
+                    <span style="font-family: monospace; font-size: 0.8rem; color: #60a5fa;">{{ executed_command }}</span>
+                {% endif %}
+            </div>
+
+            <pre style="font-family: 'Consolas', 'Courier New', monospace; font-size: 0.9rem; color: #34d399; line-height: 1.5; white-space: pre-wrap; word-break: break-all; margin: 0; padding: 0.5rem 0;">{{ output }}</pre>
+        </div>
+    {% endif %}
+
+    <!-- Hướng dẫn & Phân tích chuyên sâu -->
+    <div class="accordion">
+        <div class="accordion-item">
+            <button class="accordion-trigger">
+                <span>🎯 Mục tiêu & Hướng dẫn khai thác bài Lab</span>
+                <span class="accordion-icon">+</span>
+            </button>
+            <div class="accordion-content">
+                <p><strong>Mục tiêu:</strong> Quan sát cách câu lệnh hệ điều hành bị can thiệp khi dữ liệu người dùng được ghép chuỗi thô vào hàm thực thi shell.</p>
+                <ul style="padding-left: 1.25rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    <li>Ở chế độ <strong>Vulnerable</strong>: Hệ thống gọi <code>subprocess.check_output(cmd, shell=True)</code>. Các toán tử phân tách lệnh như <code>;</code>, <code>&</code>, <code>|</code> cho phép ngắt lệnh ping và thực thi lệnh tùy ý kế tiếp.</li>
+                    <li>Ở chế độ <strong>Fixed</strong>: Backend sử dụng biểu thức chính quy (Regex Whitelist) kiểm tra địa chỉ hợp lệ và gọi lệnh với <code>shell=False</code>. Mọi ký tự điều khiển lệnh đều bị vô hiệu hóa.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setPayload(val) {
+    document.getElementById('target').value = val;
+}
+</script>
+{% endblock %}
